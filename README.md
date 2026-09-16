@@ -227,7 +227,7 @@ Whenever the graphs or the Python modules change: `python build_site.py`, run th
 - Code: MIT License (see `LICENSE`).
 - Knowledge graphs (`data/*.ttl`): CC BY 4.0, as declared in their dataset records. Cite the release graph as:
 
-  > Hamed, N., Yao, F., Potoglou, D., Haggar, P., Sharma, A., Wadhwa, A., Beck, N. & Rana, O. (2026) CLEETS-KG v1.3.0: knowledge graph of electric-vehicle adoption and charging provision across Welsh local authority districts [Data set]. Zenodo. (DOI to be minted on deposit.)
+  > Hamed, N., Yao, F., Potoglou, D., Haggar, P., Sharma, A., Wadhwa, A. & Rana, O. (2026) CLEETS-KG v1.3.0: knowledge graph of electric-vehicle adoption and charging provision across Welsh local authority districts [Data set]. Zenodo. (DOI to be minted on deposit.)
 
 - Source statistics: DfT/DVLA VEH0132 and VEH0105, DfT/OZEV EVCI9001, Welsh Government StatsWales population estimates and WIMD 2025, ONS population density and geography lookups, all under the Open Government Licence v3; full citations and landing pages are stored in the graph and printed by the chatbot.
 - Software citation: see `CITATION.cff`.
