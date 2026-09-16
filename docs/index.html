@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLEETS-CHAT: Cited and Hallucination-Free AI with Traceability</title>
+<meta name="description" content="Question answering over the CLEETS knowledge graphs for electric-vehicle adoption in Wales: observed data, six prediction types from the paper, cited sources, custom datasets and an OpenStreetMap view of the 22 Welsh local authorities.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="banner">
+      <div class="sweep" aria-hidden="true"></div>
+      <a class="brand" href="https://cleets-global-center.org/" target="_blank" rel="noopener" title="CLEETS Global Center">
+        <img id="logo" src="assets/cleets_logo.png" alt="CLEETS logo" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'wordmark',innerHTML:'<div class=&quot;wm&quot;>CLEETS</div><div class=&quot;wm-sub&quot;>Clean Energy and Equitable Transportation Solutions</div><div class=&quot;wm-sub&quot;>NSF-UKRI Global Center</div>'}))">
+      </a>
+      <nav class="nav">
+        <a href="#sec-about">About</a><a href="#sec-map">Map</a><a href="#sec-ask">Ask</a><a href="#sec-mode">Predictions</a><a href="#sec-datasets">Datasets</a><a href="#sec-feedback">Feedback</a>
+        <a href="https://cleets-global-center.org/" target="_blank" rel="noopener">CLEETS website</a>
+      </nav>
+    </div>
+    <div class="titleband">
+      <h1 id="title">CLEETS-CHAT: Cited and Hallucination-Free AI with Traceability</h1>
+      <p>Ask free-text questions over observed CLEETS knowledge and prediction resources. Answers are composed from the knowledge graphs only, cite their source datasets, and every prediction explains how it was generated. This page runs the same Python question-answering code as the desktop app, inside your browser.</p>
+      <div class="chips" id="chips"></div>
+    </div>
+  </header>
+
+  <section class="card" id="sec-about">
+    <h2>About CLEETS-CHAT</h2>
+    <div id="about"></div>
+  </section>
+
+  <section class="card" id="sec-map">
+    <div class="card-head">
+      <div>
+        <h2>Map the data</h2>
+        <p class="muted">OpenStreetMap view of the 22 Welsh local authority districts. Marker size and colour follow the selected metric, or any column of a custom dataset. Click a district to pre-fill a question and add it to the dataset selection.</p>
+      </div>
+      <label class="field"><span>Metric</span><select id="map-metric"></select></label>
+    </div>
+    <div id="map"></div>
+    <div id="map-legend" class="legend"></div>
+  </section>
+
+  <div class="grid-2" id="sec-mode">
+    <section class="card pale">
+      <h2>Query mode</h2>
+      <div class="radios" id="mode-switch">
+        <label><input type="radio" name="mode" value="actual"> Actual Data</label>
+        <label><input type="radio" name="mode" value="prediction" checked> Predictions</label>
+      </div>
+      <p class="muted" id="mode-description"></p>
+      <div id="family-block">
+        <h3>Prediction type (as in the paper)</h3>
+        <div class="radios small" id="family-switch"></div>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Runtime</h2>
+      <p id="runtime-status" class="status">Loading the Python runtime (Pyodide, about 10 MB)…</p>
+      <p class="muted small">Answers are templated over the knowledge graph and identical to the desktop app's. The optional Claude rewording and the shared feedback database need the Python server (<a id="repo-link" href="#" target="_blank" rel="noopener">repository</a>).</p>
+    </section>
+  </div>
+
+  <section class="card" id="sec-ask">
+    <div class="row">
+      <h2>Ask a free-text question</h2>
+      <button id="help-toggle" class="round" title="What can I ask?">ⓘ</button>
+      <span class="muted small">What can I ask?</span>
+    </div>
+    <div id="help-panel" class="help hidden"></div>
+    <textarea id="question" rows="4" placeholder="Ask in your own words: compare Cardiff and Swansea, when does Powys reach 99% BEV share, give me a table of keepership and deprivation for all LADs..."></textarea>
+    <div class="row">
+      <button id="ask" class="btn primary" disabled>Ask CLEETS-CHAT</button>
+      <button id="show-inventory" class="btn" disabled>Show data inventory</button>
+    </div>
+  </section>
+
+  <section class="card pale2">
+    <div id="answer" class="answer"><p class="muted">Your answer will appear here.</p></div>
+    <div id="methods-bar" class="row hidden">
+      <button id="methods-toggle" class="btn outline">ⓘ&nbsp; How was this predicted?</button>
+      <label class="field inline"><span>Prediction type:</span><select id="methods-family"></select></label>
+    </div>
+    <div id="methods-box" class="methods hidden"></div>
+  </section>
+
+  <section class="card" id="sec-datasets">
+    <h2>Build a custom dataset from the knowledge graphs</h2>
+    <p class="muted">Choose columns and districts, build the table, then download it as CSV or plot any column on the map. Tables produced by the chatbot appear here too.</p>
+    <div class="grid-3">
+      <div>
+        <h3>Columns</h3>
+        <div id="ds-columns" class="checks"></div>
+      </div>
+      <div>
+        <h3>Districts (none selected = all 22; map clicks add here)</h3>
+        <div id="ds-lads" class="chips-select"></div>
+        <h3>Observation year (optional)</h3>
+        <input id="ds-year" type="number" min="2009" max="2026" placeholder="latest">
+        <p class="muted small">Latest available value per LAD when left empty.</p>
+      </div>
+      <div>
+        <h3>Actions</h3>
+        <div class="stack">
+          <button id="ds-build" class="btn primary" disabled>Build table</button>
+          <button id="ds-download" class="btn green" disabled>Download CSV</button>
+        </div>
+        <h3>Plot a column on the map</h3>
+        <select id="ds-plot-column"></select>
+        <button id="ds-plot" class="btn outline" disabled>Plot on map</button>
+      </div>
+    </div>
+    <p id="ds-status" class="status"></p>
+    <div id="ds-table" class="table-wrap"></div>
+    <p id="ds-sources" class="muted small"></p>
+  </section>
+
+  <section class="card" id="sec-feedback">
+    <h2>Score this answer</h2>
+    <p class="muted">Scores are kept in this browser (this static page has no server). Export them as CSV to share with the maintainers; the desktop app stores them in a shared database.</p>
+    <div class="row">
+      <input id="feedback-score" type="range" min="1" max="10" value="7"><span id="feedback-score-value" class="score">7</span>
+    </div>
+    <textarea id="feedback-notes" rows="2" placeholder="Optional: what was missing, unclear or wrong?"></textarea>
+    <div class="row">
+      <button id="feedback-submit" class="btn green">Submit score</button>
+      <button id="feedback-export" class="btn">Export scores (CSV)</button>
+      <span id="feedback-status" class="status"></span>
+    </div>
+  </section>
+
+  <footer class="foot" id="foot"></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

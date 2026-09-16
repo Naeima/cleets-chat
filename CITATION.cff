@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: "If you use CLEETS-CHAT, please cite it as below, and cite the CLEETS-KG data set separately (see README)."
+title: "CLEETS-CHAT: Cited and Hallucination-Free AI with Traceability"
+type: software
+version: 1.1.0
+date-released: 2026-09-16
+license: MIT
+repository-code: "https://github.com/Naeima/cleets-chat"
+url: "https://naeima.github.io/cleets-chat/"
+abstract: >-
+  Question answering over the CLEETS knowledge graphs of electric-vehicle adoption in Wales.
+  Answers are composed from retrieved RDF statements and deterministic calculations, cite their
+  source datasets, separate observed from predicted values, and explain how each prediction type
+  of the companion paper was generated. Includes a Dash dashboard, a static GitHub Pages build
+  that runs the same Python code in the browser, custom dataset extraction with map plotting and
+  CSV download, and stakeholder scoring of answers.
+authors:
+  - family-names: Hamed
+    given-names: Naeima
+    affiliation: "School of Computer Science and Informatics, Cardiff University"
+    email: naeima.hamed@gmail.com
+keywords:
+  - knowledge graph
+  - RDF
+  - question answering
+  - electric vehicles
+  - Wales
+  - provenance
+  - reproducibility
+references:
+  - type: data
+    title: "CLEETS-KG v1.3.0: knowledge graph of electric-vehicle adoption and charging provision across Welsh local authority districts"
+    year: 2026
+    authors:
+      - family-names: Hamed
+        given-names: Naeima
+      - family-names: Yao
+        given-names: Fulong
+      - family-names: Potoglou
+        given-names: Dimitris
+      - family-names: Haggar
+        given-names: Paul
+      - family-names: Sharma
+        given-names: Ashish
+      - family-names: Wadhwa
+        given-names: Abhinav
+      - family-names: Beck
+        given-names: Nora
+      - family-names: Rana
+        given-names: Omer
+    license: CC-BY-4.0
+    notes: "Zenodo DOI to be minted on deposit; the dataset record inside data/cleets_cskg_enriched.ttl carries the citation."

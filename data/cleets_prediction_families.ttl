@@ -1,0 +1,2838 @@
+@prefix cleets: <https://w3id.org/def/cleets#> .
+@prefix data: <https://w3id.org/def/cleets/data#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+cleets:arrivalRank a owl:DatatypeProperty ;
+    rdfs:label "arrival rank (earliest first)"@en .
+
+cleets:betaHi a owl:DatatypeProperty ;
+    rdfs:label "upper bound"@en .
+
+cleets:betaLo a owl:DatatypeProperty ;
+    rdfs:label "lower bound"@en .
+
+cleets:betaLogRate a owl:DatatypeProperty ;
+    rdfs:label "covariate effect on log rate"@en .
+
+cleets:betaMidpointQuarters a owl:DatatypeProperty ;
+    rdfs:label "covariate effect on the midpoint (quarters per 1 sd)"@en .
+
+cleets:bevShare2045 a owl:DatatypeProperty ;
+    rdfs:label "BEV share of private stock at 2045 Q4"@en .
+
+cleets:bevShareEnd a owl:DatatypeProperty ;
+    rdfs:label "BEV share of private stock at horizon end (2053 Q4)"@en .
+
+cleets:chargerShortfall2045 a owl:DatatypeProperty ;
+    rdfs:label "public charging devices short of the benchmark at 2045"@en .
+
+cleets:ciWidthYears a owl:DatatypeProperty ;
+    rdfs:label "95% interval width of the midpoint (years)"@en .
+
+cleets:constraintClass a owl:DatatypeProperty ;
+    rdfs:label "constraint class"@en .
+
+cleets:covariateTerm a owl:DatatypeProperty ;
+    rdfs:label "covariate term"@en .
+
+cleets:crossesZero a owl:DatatypeProperty ;
+    rdfs:label "interval crosses zero"@en .
+
+cleets:evsPerChargePoint2045 a owl:DatatypeProperty ;
+    rdfs:label "BEVs per public charging device at 2045 Q4"@en .
+
+cleets:impliedAnnualReplacementPct a owl:DatatypeProperty ;
+    rdfs:label "implied annual replacement (%)"@en .
+
+cleets:lagVsMedianYears a owl:DatatypeProperty ;
+    rdfs:label "lag against Welsh median midpoint (years)"@en .
+
+cleets:lagYearsAt80pc a owl:DatatypeProperty ;
+    rdfs:label "diffusion lag at 80% BEV share (years behind Wales)"@en .
+
+cleets:mae a owl:DatatypeProperty ;
+    rdfs:label "mean absolute error"@en .
+
+cleets:medianScrappageYears a owl:DatatypeProperty ;
+    rdfs:label "median scrappage age (years)"@en .
+
+cleets:metricNote a owl:DatatypeProperty ;
+    rdfs:label "metric note"@en .
+
+cleets:metricTarget a owl:DatatypeProperty ;
+    rdfs:label "metric target"@en .
+
+cleets:midpointPeriod a owl:DatatypeProperty ;
+    rdfs:label "midpoint period"@en .
+
+cleets:modelName a owl:DatatypeProperty ;
+    rdfs:label "model name"@en .
+
+cleets:nPredictions a owl:DatatypeProperty ;
+    rdfs:label "number of held-out predictions"@en .
+
+cleets:notebookStage a owl:DatatypeProperty ;
+    rdfs:label "notebook stage"@en .
+
+cleets:observedValue a owl:DatatypeProperty ;
+    rdfs:label "observed value"@en .
+
+cleets:paperSection a owl:DatatypeProperty ;
+    rdfs:label "paper section"@en .
+
+cleets:pooledR2 a owl:DatatypeProperty ;
+    rdfs:label "pooled coefficient of determination over all held-out LAD-quarters"@en .
+
+cleets:predictedValue a owl:DatatypeProperty ;
+    rdfs:label "model-predicted value"@en .
+
+cleets:provisionAdequacy a owl:DatatypeProperty ;
+    rdfs:label "provision adequacy (benchmark 20 BEVs per device)"@en .
+
+cleets:r2 a owl:DatatypeProperty ;
+    rdfs:label "coefficient of determination"@en .
+
+cleets:ratePerQuarter a owl:DatatypeProperty ;
+    rdfs:label "logistic rate per quarter"@en .
+
+cleets:reachesShare a owl:DatatypeProperty ;
+    rdfs:label "first quarter at which the threshold share is reached"@en .
+
+cleets:residual a owl:DatatypeProperty ;
+    rdfs:label "residual (observed minus predicted)"@en .
+
+cleets:residualNonBEV a owl:DatatypeProperty ;
+    rdfs:label "residual non-BEV private vehicles at horizon end"@en .
+
+cleets:rmse a owl:DatatypeProperty ;
+    rdfs:label "root mean squared error"@en .
+
+cleets:shortfallFrom100pp a owl:DatatypeProperty ;
+    rdfs:label "shortfall from 100% (percentage points)"@en .
+
+cleets:shrinkageWeight a owl:DatatypeProperty ;
+    rdfs:label "empirical-Bayes shrinkage weight"@en .
+
+cleets:slowestRank a owl:DatatypeProperty ;
+    rdfs:label "rank, slowest diffusion first"@en .
+
+<https://w3id.org/def/cleets/data#charging/W06000001> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Isle of Anglesey charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9586 ;
+    cleets:chargerShortfall2045 2052.8 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 195.84 ;
+    cleets:forLAD data:W06000001 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.11 ;
+    cleets:provisionAdequacy 0.1 .
+
+<https://w3id.org/def/cleets/data#charging/W06000002> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Gwynedd charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9586 ;
+    cleets:chargerShortfall2045 2933.21 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 104.39 ;
+    cleets:forLAD data:W06000002 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.11 ;
+    cleets:provisionAdequacy 0.19 .
+
+<https://w3id.org/def/cleets/data#charging/W06000003> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Conwy charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9595999999999999 ;
+    cleets:chargerShortfall2045 3103.27 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 204.19 ;
+    cleets:forLAD data:W06000003 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.03 ;
+    cleets:provisionAdequacy 0.1 .
+
+<https://w3id.org/def/cleets/data#charging/W06000004> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Denbighshire charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.96 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 230.57 ;
+    cleets:forLAD data:W06000004 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.0 ;
+    cleets:provisionAdequacy 0.09 .
+
+<https://w3id.org/def/cleets/data#charging/W06000005> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Flintshire charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9606999999999999 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 355.4 ;
+    cleets:forLAD data:W06000005 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.05 ;
+    cleets:provisionAdequacy 0.06 .
+
+<https://w3id.org/def/cleets/data#charging/W06000006> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Wrexham charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9595 ;
+    cleets:chargerShortfall2045 3606.67 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 250.39 ;
+    cleets:forLAD data:W06000006 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.04 ;
+    cleets:provisionAdequacy 0.08 .
+
+<https://w3id.org/def/cleets/data#charging/W06000008> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Ceredigion charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9587 ;
+    cleets:chargerShortfall2045 2001.23 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 127.75 ;
+    cleets:forLAD data:W06000008 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.11 ;
+    cleets:provisionAdequacy 0.16 .
+
+<https://w3id.org/def/cleets/data#charging/W06000009> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Pembrokeshire charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9591 ;
+    cleets:chargerShortfall2045 3479.93 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 124.92 ;
+    cleets:forLAD data:W06000009 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.07 ;
+    cleets:provisionAdequacy 0.16 .
+
+<https://w3id.org/def/cleets/data#charging/W06000010> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Carmarthenshire charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9595 ;
+    cleets:chargerShortfall2045 5464.7 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 211.59 ;
+    cleets:forLAD data:W06000010 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.04 ;
+    cleets:provisionAdequacy 0.09 .
+
+<https://w3id.org/def/cleets/data#charging/W06000011> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Swansea charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9601999999999999 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 227.3 ;
+    cleets:forLAD data:W06000011 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.01 ;
+    cleets:provisionAdequacy 0.09 .
+
+<https://w3id.org/def/cleets/data#charging/W06000012> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Neath Port Talbot charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9601000000000001 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 669.85 ;
+    cleets:forLAD data:W06000012 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.0 ;
+    cleets:provisionAdequacy 0.03 .
+
+<https://w3id.org/def/cleets/data#charging/W06000013> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Bridgend charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9615 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 218.49 ;
+    cleets:forLAD data:W06000013 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.12 ;
+    cleets:provisionAdequacy 0.09 .
+
+<https://w3id.org/def/cleets/data#charging/W06000014> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Vale of Glamorgan charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9614 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 160.82 ;
+    cleets:forLAD data:W06000014 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.12 ;
+    cleets:provisionAdequacy 0.12 .
+
+<https://w3id.org/def/cleets/data#charging/W06000015> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Cardiff charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.961 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 261.32 ;
+    cleets:forLAD data:W06000015 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.08 ;
+    cleets:provisionAdequacy 0.08 .
+
+<https://w3id.org/def/cleets/data#charging/W06000016> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Rhondda Cynon Taf charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9599 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 211.44 ;
+    cleets:forLAD data:W06000016 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.01 ;
+    cleets:provisionAdequacy 0.09 .
+
+<https://w3id.org/def/cleets/data#charging/W06000018> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Caerphilly charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.96 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 449.81 ;
+    cleets:forLAD data:W06000018 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.01 ;
+    cleets:provisionAdequacy 0.04 .
+
+<https://w3id.org/def/cleets/data#charging/W06000019> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Blaenau Gwent charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9593 ;
+    cleets:chargerShortfall2045 1644.09 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 159.24 ;
+    cleets:forLAD data:W06000019 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.06 ;
+    cleets:provisionAdequacy 0.13 .
+
+<https://w3id.org/def/cleets/data#charging/W06000020> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Torfaen charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9598 ;
+    cleets:chargerShortfall2045 2349.04 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 206.38 ;
+    cleets:forLAD data:W06000020 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.02 ;
+    cleets:provisionAdequacy 0.1 .
+
+<https://w3id.org/def/cleets/data#charging/W06000021> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Monmouthshire charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9614 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 167.23 ;
+    cleets:forLAD data:W06000021 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.12 ;
+    cleets:provisionAdequacy 0.12 .
+
+<https://w3id.org/def/cleets/data#charging/W06000022> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Newport charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9611 ;
+    cleets:constraintClass "provision will bind later" ;
+    cleets:evsPerChargePoint2045 157.21 ;
+    cleets:forLAD data:W06000022 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc -0.09 ;
+    cleets:provisionAdequacy 0.13 .
+
+<https://w3id.org/def/cleets/data#charging/W06000023> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Powys charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9589 ;
+    cleets:chargerShortfall2045 4241.04 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 201.64 ;
+    cleets:forLAD data:W06000023 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.09 ;
+    cleets:provisionAdequacy 0.1 .
+
+<https://w3id.org/def/cleets/data#charging/W06000024> a cleets:ChargingConstraintAssessment ;
+    rdfs:label "Merthyr Tydfil charging-provision constraint assessment for 2045" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/charging-2026-09-16> ;
+    cleets:bevShare2045 0.9595999999999999 ;
+    cleets:chargerShortfall2045 1334.44 ;
+    cleets:constraintClass "charging plausibly binding" ;
+    cleets:evsPerChargePoint2045 243.53 ;
+    cleets:forLAD data:W06000024 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:lagYearsAt80pc 0.04 ;
+    cleets:provisionAdequacy 0.08 .
+
+<https://w3id.org/def/cleets/data#covariates/metric/0> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:mae 1.567 ;
+    cleets:metricNote "Table 8: features population, density, area_km2; stochastic models averaged over five seeds" ;
+    cleets:metricTarget "EVs per 1,000 residents (leave-one-out, 22 LADs)" ;
+    cleets:modelName "Extra Trees" ;
+    cleets:r2 -0.04 ;
+    cleets:rmse 2.155 .
+
+<https://w3id.org/def/cleets/data#covariates/metric/1> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:mae 1.558 ;
+    cleets:metricNote "Table 8: features population, density, area_km2; stochastic models averaged over five seeds" ;
+    cleets:metricTarget "EVs per 1,000 residents (leave-one-out, 22 LADs)" ;
+    cleets:modelName "GraphSAGE" ;
+    cleets:r2 -0.076 ;
+    cleets:rmse 2.187 .
+
+<https://w3id.org/def/cleets/data#covariates/metric/2> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:mae 1.535 ;
+    cleets:metricNote "Table 8: features population, density, area_km2; stochastic models averaged over five seeds" ;
+    cleets:metricTarget "EVs per 1,000 residents (leave-one-out, 22 LADs)" ;
+    cleets:modelName "Mean baseline" ;
+    cleets:r2 -0.098 ;
+    cleets:rmse 2.214 .
+
+<https://w3id.org/def/cleets/data#covariates/metric/3> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:mae 1.543 ;
+    cleets:metricNote "Table 8: features population, density, area_km2; stochastic models averaged over five seeds" ;
+    cleets:metricTarget "EVs per 1,000 residents (leave-one-out, 22 LADs)" ;
+    cleets:modelName "Ridge" ;
+    cleets:r2 -0.104 ;
+    cleets:rmse 2.221 .
+
+<https://w3id.org/def/cleets/data#covariates/metric/4> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:mae 1.817 ;
+    cleets:metricNote "Table 8: features population, density, area_km2; stochastic models averaged over five seeds" ;
+    cleets:metricTarget "EVs per 1,000 residents (leave-one-out, 22 LADs)" ;
+    cleets:modelName "Random Forest" ;
+    cleets:r2 -0.242 ;
+    cleets:rmse 2.355 .
+
+<https://w3id.org/def/cleets/data#covariates/metric/5> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:mae 2.121 ;
+    cleets:metricNote "Table 8: features population, density, area_km2; stochastic models averaged over five seeds" ;
+    cleets:metricTarget "EVs per 1,000 residents (leave-one-out, 22 LADs)" ;
+    cleets:modelName "GCN" ;
+    cleets:r2 -0.82 ;
+    cleets:rmse 2.851 .
+
+<https://w3id.org/def/cleets/data#covariates/metric/6> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:mae 2.775 ;
+    cleets:metricNote "Table 8: features population, density, area_km2; stochastic models averaged over five seeds" ;
+    cleets:metricTarget "EVs per 1,000 residents (leave-one-out, 22 LADs)" ;
+    cleets:modelName "GAT" ;
+    cleets:r2 -2.336 ;
+    cleets:rmse 3.84 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000001> a cleets:CovariateResidual ;
+    rdfs:label "Isle of Anglesey EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000001 ;
+    cleets:observedValue 7.03 ;
+    cleets:predictedValue 7.67 ;
+    cleets:residual -0.63 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000002> a cleets:CovariateResidual ;
+    rdfs:label "Gwynedd EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000002 ;
+    cleets:observedValue 5.89 ;
+    cleets:predictedValue 7.67 ;
+    cleets:residual -1.78 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000003> a cleets:CovariateResidual ;
+    rdfs:label "Conwy EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000003 ;
+    cleets:observedValue 7.76 ;
+    cleets:predictedValue 7.67 ;
+    cleets:residual 0.1 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000004> a cleets:CovariateResidual ;
+    rdfs:label "Denbighshire EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000004 ;
+    cleets:observedValue 8.32 ;
+    cleets:predictedValue 7.67 ;
+    cleets:residual 0.65 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000005> a cleets:CovariateResidual ;
+    rdfs:label "Flintshire EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000005 ;
+    cleets:observedValue 9.14 ;
+    cleets:predictedValue 7.66 ;
+    cleets:residual 1.48 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000006> a cleets:CovariateResidual ;
+    rdfs:label "Wrexham EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000006 ;
+    cleets:observedValue 6.76 ;
+    cleets:predictedValue 7.66 ;
+    cleets:residual -0.91 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000008> a cleets:CovariateResidual ;
+    rdfs:label "Ceredigion EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000008 ;
+    cleets:observedValue 7.69 ;
+    cleets:predictedValue 7.67 ;
+    cleets:residual 0.01 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000009> a cleets:CovariateResidual ;
+    rdfs:label "Pembrokeshire EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000009 ;
+    cleets:observedValue 8.03 ;
+    cleets:predictedValue 7.67 ;
+    cleets:residual 0.36 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000010> a cleets:CovariateResidual ;
+    rdfs:label "Carmarthenshire EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000010 ;
+    cleets:observedValue 7.74 ;
+    cleets:predictedValue 7.67 ;
+    cleets:residual 0.07 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000011> a cleets:CovariateResidual ;
+    rdfs:label "Swansea EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000011 ;
+    cleets:observedValue 7.13 ;
+    cleets:predictedValue 7.65 ;
+    cleets:residual -0.52 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000012> a cleets:CovariateResidual ;
+    rdfs:label "Neath Port Talbot EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000012 ;
+    cleets:observedValue 6.3 ;
+    cleets:predictedValue 7.66 ;
+    cleets:residual -1.36 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000013> a cleets:CovariateResidual ;
+    rdfs:label "Bridgend EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000013 ;
+    cleets:observedValue 9.26 ;
+    cleets:predictedValue 7.66 ;
+    cleets:residual 1.6 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000014> a cleets:CovariateResidual ;
+    rdfs:label "Vale of Glamorgan EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000014 ;
+    cleets:observedValue 11.46 ;
+    cleets:predictedValue 7.66 ;
+    cleets:residual 3.8 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000015> a cleets:CovariateResidual ;
+    rdfs:label "Cardiff EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000015 ;
+    cleets:observedValue 6.75 ;
+    cleets:predictedValue 7.61 ;
+    cleets:residual -0.87 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000016> a cleets:CovariateResidual ;
+    rdfs:label "Rhondda Cynon Taf EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000016 ;
+    cleets:observedValue 5.93 ;
+    cleets:predictedValue 7.65 ;
+    cleets:residual -1.73 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000018> a cleets:CovariateResidual ;
+    rdfs:label "Caerphilly EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000018 ;
+    cleets:observedValue 6.32 ;
+    cleets:predictedValue 7.65 ;
+    cleets:residual -1.33 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000019> a cleets:CovariateResidual ;
+    rdfs:label "Blaenau Gwent EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000019 ;
+    cleets:observedValue 4.26 ;
+    cleets:predictedValue 7.66 ;
+    cleets:residual -3.4 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000020> a cleets:CovariateResidual ;
+    rdfs:label "Torfaen EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000020 ;
+    cleets:observedValue 6.92 ;
+    cleets:predictedValue 7.65 ;
+    cleets:residual -0.74 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000021> a cleets:CovariateResidual ;
+    rdfs:label "Monmouthshire EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000021 ;
+    cleets:observedValue 14.41 ;
+    cleets:predictedValue 7.67 ;
+    cleets:residual 6.74 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000022> a cleets:CovariateResidual ;
+    rdfs:label "Newport EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000022 ;
+    cleets:observedValue 8.37 ;
+    cleets:predictedValue 7.65 ;
+    cleets:residual 0.72 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000023> a cleets:CovariateResidual ;
+    rdfs:label "Powys EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000023 ;
+    cleets:observedValue 8.2 ;
+    cleets:predictedValue 7.68 ;
+    cleets:residual 0.52 .
+
+<https://w3id.org/def/cleets/data#covariates/residual/W06000024> a cleets:CovariateResidual ;
+    rdfs:label "Merthyr Tydfil EVs per 1,000 residents against the Ridge covariate prediction" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> ;
+    cleets:forLAD data:W06000024 ;
+    cleets:observedValue 4.85 ;
+    cleets:predictedValue 7.66 ;
+    cleets:residual -2.81 .
+
+<https://w3id.org/def/cleets/data#dataset/PredictionKG> dcterms:bibliographicCitation "Hamed, N. et al. (2026) CLEETS Prediction KG: quarterly per-LAD private BEV diffusion scenarios for Wales to 2045 [Data set]. Companion to \"Predicting EV adoption in Wales using Semantic Knowledge Graph\" (manuscript). https://w3id.org/def/cleets"@en ;
+    dcterms:identifier "CLEETS-PredictionKG" ;
+    dcterms:publisher "Cardiff University (CLEETS project)" ;
+    dcat:landingPage <https://w3id.org/def/cleets> .
+
+<https://w3id.org/def/cleets/data#diffusion/metric/stage13/chargers/central> a cleets:ModelMetric ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> ;
+    cleets:mae 12.78 ;
+    cleets:metricNote "Stage 13: rolling-origin one-step-ahead quarterly backtest 2022Q1-2025Q4, off the released KG; scenario capacity anchored on the last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Bounded logistic (released KG)" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.91 ;
+    cleets:r2 0.803 ;
+    cleets:rmse 19.32 ;
+    cleets:scenario "Central" .
+
+<https://w3id.org/def/cleets/data#diffusion/metric/stage13/chargers/high> a cleets:ModelMetric ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> ;
+    cleets:mae 12.89 ;
+    cleets:metricNote "Stage 13: rolling-origin one-step-ahead quarterly backtest 2022Q1-2025Q4, off the released KG; scenario capacity anchored on the last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Bounded logistic (released KG)" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.908 ;
+    cleets:r2 0.799 ;
+    cleets:rmse 19.51 ;
+    cleets:scenario "High" .
+
+<https://w3id.org/def/cleets/data#diffusion/metric/stage13/chargers/low> a cleets:ModelMetric ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> ;
+    cleets:mae 12.59 ;
+    cleets:metricNote "Stage 13: rolling-origin one-step-ahead quarterly backtest 2022Q1-2025Q4, off the released KG; scenario capacity anchored on the last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Bounded logistic (released KG)" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.913 ;
+    cleets:r2 0.809 ;
+    cleets:rmse 18.95 ;
+    cleets:scenario "Low" .
+
+<https://w3id.org/def/cleets/data#diffusion/metric/stage13/keepership/central> a cleets:ModelMetric ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> ;
+    cleets:mae 28.16 ;
+    cleets:metricNote "Stage 13: rolling-origin one-step-ahead quarterly backtest 2022Q1-2025Q4, off the released KG; scenario capacity anchored on the last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Bounded logistic (released KG)" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.995 ;
+    cleets:r2 0.986 ;
+    cleets:rmse 35.36 ;
+    cleets:scenario "Central" .
+
+<https://w3id.org/def/cleets/data#diffusion/metric/stage13/keepership/high> a cleets:ModelMetric ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> ;
+    cleets:mae 29.93 ;
+    cleets:metricNote "Stage 13: rolling-origin one-step-ahead quarterly backtest 2022Q1-2025Q4, off the released KG; scenario capacity anchored on the last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Bounded logistic (released KG)" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.994 ;
+    cleets:r2 0.985 ;
+    cleets:rmse 37.33 ;
+    cleets:scenario "High" .
+
+<https://w3id.org/def/cleets/data#diffusion/metric/stage13/keepership/low> a cleets:ModelMetric ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> ;
+    cleets:mae 25.15 ;
+    cleets:metricNote "Stage 13: rolling-origin one-step-ahead quarterly backtest 2022Q1-2025Q4, off the released KG; scenario capacity anchored on the last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Bounded logistic (released KG)" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.996 ;
+    cleets:r2 0.989 ;
+    cleets:rmse 32.31 ;
+    cleets:scenario "Low" .
+
+<https://w3id.org/def/cleets/data#hier/W06000001> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Isle of Anglesey hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.698 ;
+    cleets:forLAD data:W06000001 ;
+    cleets:forTime data:Period2037Q3 ;
+    cleets:lagVsMedianYears 2.267 ;
+    cleets:midpointPeriod "2037Q3" ;
+    cleets:ratePerQuarter 0.092 ;
+    cleets:shrinkageWeight 0.963 ;
+    cleets:slowestRank 3 .
+
+<https://w3id.org/def/cleets/data#hier/W06000002> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Gwynedd hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.54 ;
+    cleets:forLAD data:W06000002 ;
+    cleets:forTime data:Period2038Q1 ;
+    cleets:lagVsMedianYears 2.563 ;
+    cleets:midpointPeriod "2038Q1" ;
+    cleets:ratePerQuarter 0.092 ;
+    cleets:shrinkageWeight 0.975 ;
+    cleets:slowestRank 1 .
+
+<https://w3id.org/def/cleets/data#hier/W06000003> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Conwy hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.654 ;
+    cleets:forLAD data:W06000003 ;
+    cleets:forTime data:Period2036Q1 ;
+    cleets:lagVsMedianYears 0.649 ;
+    cleets:midpointPeriod "2036Q1" ;
+    cleets:ratePerQuarter 0.101 ;
+    cleets:shrinkageWeight 0.968 ;
+    cleets:slowestRank 7 .
+
+<https://w3id.org/def/cleets/data#hier/W06000004> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Denbighshire hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.287 ;
+    cleets:forLAD data:W06000004 ;
+    cleets:forTime data:Period2035Q2 ;
+    cleets:lagVsMedianYears 0.011 ;
+    cleets:midpointPeriod "2035Q2" ;
+    cleets:ratePerQuarter 0.106 ;
+    cleets:shrinkageWeight 0.993 ;
+    cleets:slowestRank 10 .
+
+<https://w3id.org/def/cleets/data#hier/W06000005> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Flintshire hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.359 ;
+    cleets:forLAD data:W06000005 ;
+    cleets:forTime data:Period2034Q4 ;
+    cleets:lagVsMedianYears -0.452 ;
+    cleets:midpointPeriod "2034Q4" ;
+    cleets:ratePerQuarter 0.11 ;
+    cleets:shrinkageWeight 0.989 ;
+    cleets:slowestRank 16 .
+
+<https://w3id.org/def/cleets/data#hier/W06000006> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Wrexham hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.387 ;
+    cleets:forLAD data:W06000006 ;
+    cleets:forTime data:Period2035Q4 ;
+    cleets:lagVsMedianYears 0.353 ;
+    cleets:midpointPeriod "2035Q4" ;
+    cleets:ratePerQuarter 0.107 ;
+    cleets:shrinkageWeight 0.987 ;
+    cleets:slowestRank 8 .
+
+<https://w3id.org/def/cleets/data#hier/W06000008> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Ceredigion hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 1.017 ;
+    cleets:forLAD data:W06000008 ;
+    cleets:forTime data:Period2037Q2 ;
+    cleets:lagVsMedianYears 1.937 ;
+    cleets:midpointPeriod "2037Q2" ;
+    cleets:ratePerQuarter 0.092 ;
+    cleets:shrinkageWeight 0.902 ;
+    cleets:slowestRank 5 .
+
+<https://w3id.org/def/cleets/data#hier/W06000009> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Pembrokeshire hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.755 ;
+    cleets:forLAD data:W06000009 ;
+    cleets:forTime data:Period2037Q2 ;
+    cleets:lagVsMedianYears 1.957 ;
+    cleets:midpointPeriod "2037Q2" ;
+    cleets:ratePerQuarter 0.092 ;
+    cleets:shrinkageWeight 0.948 ;
+    cleets:slowestRank 4 .
+
+<https://w3id.org/def/cleets/data#hier/W06000010> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Carmarthenshire hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.709 ;
+    cleets:forLAD data:W06000010 ;
+    cleets:forTime data:Period2036Q3 ;
+    cleets:lagVsMedianYears 1.149 ;
+    cleets:midpointPeriod "2036Q3" ;
+    cleets:ratePerQuarter 0.098 ;
+    cleets:shrinkageWeight 0.964 ;
+    cleets:slowestRank 6 .
+
+<https://w3id.org/def/cleets/data#hier/W06000011> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Swansea hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.591 ;
+    cleets:forLAD data:W06000011 ;
+    cleets:forTime data:Period2035Q3 ;
+    cleets:lagVsMedianYears 0.216 ;
+    cleets:midpointPeriod "2035Q3" ;
+    cleets:ratePerQuarter 0.106 ;
+    cleets:shrinkageWeight 0.977 ;
+    cleets:slowestRank 9 .
+
+<https://w3id.org/def/cleets/data#hier/W06000012> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Neath Port Talbot hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.436 ;
+    cleets:forLAD data:W06000012 ;
+    cleets:forTime data:Period2034Q4 ;
+    cleets:lagVsMedianYears -0.488 ;
+    cleets:midpointPeriod "2034Q4" ;
+    cleets:ratePerQuarter 0.117 ;
+    cleets:shrinkageWeight 0.982 ;
+    cleets:slowestRank 17 .
+
+<https://w3id.org/def/cleets/data#hier/W06000013> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Bridgend hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.536 ;
+    cleets:forLAD data:W06000013 ;
+    cleets:forTime data:Period2034Q2 ;
+    cleets:lagVsMedianYears -1.052 ;
+    cleets:midpointPeriod "2034Q2" ;
+    cleets:ratePerQuarter 0.113 ;
+    cleets:shrinkageWeight 0.979 ;
+    cleets:slowestRank 22 .
+
+<https://w3id.org/def/cleets/data#hier/W06000014> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Vale of Glamorgan hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.444 ;
+    cleets:forLAD data:W06000014 ;
+    cleets:forTime data:Period2035Q1 ;
+    cleets:lagVsMedianYears -0.318 ;
+    cleets:midpointPeriod "2035Q1" ;
+    cleets:ratePerQuarter 0.1 ;
+    cleets:shrinkageWeight 0.984 ;
+    cleets:slowestRank 13 .
+
+<https://w3id.org/def/cleets/data#hier/W06000015> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Cardiff hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.297 ;
+    cleets:forLAD data:W06000015 ;
+    cleets:forTime data:Period2035Q1 ;
+    cleets:lagVsMedianYears -0.337 ;
+    cleets:midpointPeriod "2035Q1" ;
+    cleets:ratePerQuarter 0.105 ;
+    cleets:shrinkageWeight 0.993 ;
+    cleets:slowestRank 15 .
+
+<https://w3id.org/def/cleets/data#hier/W06000016> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Rhondda Cynon Taf hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.439 ;
+    cleets:forLAD data:W06000016 ;
+    cleets:forTime data:Period2035Q1 ;
+    cleets:lagVsMedianYears -0.331 ;
+    cleets:midpointPeriod "2035Q1" ;
+    cleets:ratePerQuarter 0.115 ;
+    cleets:shrinkageWeight 0.986 ;
+    cleets:slowestRank 14 .
+
+<https://w3id.org/def/cleets/data#hier/W06000018> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Caerphilly hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.318 ;
+    cleets:forLAD data:W06000018 ;
+    cleets:forTime data:Period2034Q3 ;
+    cleets:lagVsMedianYears -0.87 ;
+    cleets:midpointPeriod "2034Q3" ;
+    cleets:ratePerQuarter 0.122 ;
+    cleets:shrinkageWeight 0.991 ;
+    cleets:slowestRank 21 .
+
+<https://w3id.org/def/cleets/data#hier/W06000019> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Blaenau Gwent hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.433 ;
+    cleets:forLAD data:W06000019 ;
+    cleets:forTime data:Period2034Q3 ;
+    cleets:lagVsMedianYears -0.868 ;
+    cleets:midpointPeriod "2034Q3" ;
+    cleets:ratePerQuarter 0.133 ;
+    cleets:shrinkageWeight 0.985 ;
+    cleets:slowestRank 20 .
+
+<https://w3id.org/def/cleets/data#hier/W06000020> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Torfaen hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.634 ;
+    cleets:forLAD data:W06000020 ;
+    cleets:forTime data:Period2035Q2 ;
+    cleets:lagVsMedianYears -0.008 ;
+    cleets:midpointPeriod "2035Q2" ;
+    cleets:ratePerQuarter 0.109 ;
+    cleets:shrinkageWeight 0.969 ;
+    cleets:slowestRank 12 .
+
+<https://w3id.org/def/cleets/data#hier/W06000021> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Monmouthshire hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.413 ;
+    cleets:forLAD data:W06000021 ;
+    cleets:forTime data:Period2035Q2 ;
+    cleets:lagVsMedianYears 0.008 ;
+    cleets:midpointPeriod "2035Q2" ;
+    cleets:ratePerQuarter 0.096 ;
+    cleets:shrinkageWeight 0.984 ;
+    cleets:slowestRank 11 .
+
+<https://w3id.org/def/cleets/data#hier/W06000022> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Newport hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.347 ;
+    cleets:forLAD data:W06000022 ;
+    cleets:forTime data:Period2034Q3 ;
+    cleets:lagVsMedianYears -0.707 ;
+    cleets:midpointPeriod "2034Q3" ;
+    cleets:ratePerQuarter 0.109 ;
+    cleets:shrinkageWeight 0.989 ;
+    cleets:slowestRank 19 .
+
+<https://w3id.org/def/cleets/data#hier/W06000023> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Powys hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.713 ;
+    cleets:forLAD data:W06000023 ;
+    cleets:forTime data:Period2037Q4 ;
+    cleets:lagVsMedianYears 2.358 ;
+    cleets:midpointPeriod "2037Q4" ;
+    cleets:ratePerQuarter 0.09 ;
+    cleets:shrinkageWeight 0.963 ;
+    cleets:slowestRank 2 .
+
+<https://w3id.org/def/cleets/data#hier/W06000024> a cleets:DiffusionParameterEstimate ;
+    rdfs:label "Merthyr Tydfil hierarchical diffusion parameters" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:ciWidthYears 0.433 ;
+    cleets:forLAD data:W06000024 ;
+    cleets:forTime data:Period2034Q4 ;
+    cleets:lagVsMedianYears -0.618 ;
+    cleets:midpointPeriod "2034Q4" ;
+    cleets:ratePerQuarter 0.124 ;
+    cleets:shrinkageWeight 0.986 ;
+    cleets:slowestRank 18 .
+
+<https://w3id.org/def/cleets/data#hier/effect/density> a cleets:CovariateEffect ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:betaHi -2.665 ;
+    cleets:betaLo -3.305 ;
+    cleets:betaLogRate 0.069 ;
+    cleets:betaMidpointQuarters -3.004 ;
+    cleets:covariateTerm "density" ;
+    cleets:crossesZero false .
+
+<https://w3id.org/def/cleets/data#hier/effect/intercept> a cleets:CovariateEffect ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:betaHi 95.886 ;
+    cleets:betaLo 95.385 ;
+    cleets:betaLogRate -2.251 ;
+    cleets:betaMidpointQuarters 95.636 ;
+    cleets:covariateTerm "intercept" ;
+    cleets:crossesZero false .
+
+<https://w3id.org/def/cleets/data#hier/effect/population> a cleets:CovariateEffect ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> ;
+    cleets:betaHi 1.462 ;
+    cleets:betaLo 0.817 ;
+    cleets:betaLogRate -0.044 ;
+    cleets:betaMidpointQuarters 1.173 ;
+    cleets:covariateTerm "population" ;
+    cleets:crossesZero false .
+
+<https://w3id.org/def/cleets/data#neural/metric/stage6e/0> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 0.0779 ;
+    cleets:metricNote "Stage 6e: walk-forward over the last eight quarters, 176 LAD-quarter predictions" ;
+    cleets:metricTarget "adoption ratio, first differences (pp)" ;
+    cleets:modelName "nn" ;
+    cleets:r2 -4.545 ;
+    cleets:rmse 0.103 .
+
+<https://w3id.org/def/cleets/data#neural/metric/stage6e/1> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 0.1069 ;
+    cleets:metricNote "Stage 6e: walk-forward over the last eight quarters, 176 LAD-quarter predictions" ;
+    cleets:metricTarget "adoption ratio, first differences (pp)" ;
+    cleets:modelName "persist" ;
+    cleets:r2 -5.974 ;
+    cleets:rmse 0.1155 .
+
+<https://w3id.org/def/cleets/data#neural/metric/stage6e/2> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 0.0272 ;
+    cleets:metricNote "Stage 6e: walk-forward over the last eight quarters, 176 LAD-quarter predictions" ;
+    cleets:metricTarget "adoption ratio, first differences (pp)" ;
+    cleets:modelName "drift" ;
+    cleets:r2 0.369 ;
+    cleets:rmse 0.0348 .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/0> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 9.344 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Persistence + drift" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.944 ;
+    cleets:r2 0.868 ;
+    cleets:rmse 15.303 ;
+    cleets:scenario "none" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/1> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 9.784 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Scenario-constrained NN" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.945 ;
+    cleets:r2 0.868 ;
+    cleets:rmse 15.107 ;
+    cleets:scenario "any" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/10> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 196.354 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Graph neural network" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.667 ;
+    cleets:r2 0.12 ;
+    cleets:rmse 282.213 ;
+    cleets:scenario "none" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/11> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 267.564 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Neural network" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.401 ;
+    cleets:r2 -2.663 ;
+    cleets:rmse 378.469 ;
+    cleets:scenario "none" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/2> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 12.587 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Bounded logistic" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.913 ;
+    cleets:r2 0.809 ;
+    cleets:rmse 18.952 ;
+    cleets:scenario "Low" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/3> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 17.222 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Scenario-constrained GNN" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.885 ;
+    cleets:r2 0.546 ;
+    cleets:rmse 21.823 ;
+    cleets:scenario "Central" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/4> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 25.282 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Graph neural network" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.698 ;
+    cleets:r2 -0.088 ;
+    cleets:rmse 35.398 ;
+    cleets:scenario "none" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/5> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 40.529 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV chargers" ;
+    cleets:modelName "Neural network" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.388 ;
+    cleets:r2 -2.458 ;
+    cleets:rmse 50.405 ;
+    cleets:scenario "none" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/6> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 17.879 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Persistence + drift" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.997 ;
+    cleets:r2 0.994 ;
+    cleets:rmse 25.989 ;
+    cleets:scenario "none" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/7> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 25.146 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Bounded logistic" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.996 ;
+    cleets:r2 0.989 ;
+    cleets:rmse 32.305 ;
+    cleets:scenario "Low" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/8> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 35.988 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Scenario-constrained NN" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.984 ;
+    cleets:r2 0.971 ;
+    cleets:rmse 61.416 ;
+    cleets:scenario "any" .
+
+<https://w3id.org/def/cleets/data#neural/metric/table7/9> a cleets:ModelMetric ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/neural-2026-09-16> ;
+    cleets:mae 113.202 ;
+    cleets:metricNote "Table 7: best configuration per approach, rolling-origin one-step-ahead quarterly backtest 2022 Q1-2025 Q4 (352 held-out LAD-quarters per configuration), K = alpha x last training observation" ;
+    cleets:metricTarget "EV keepership" ;
+    cleets:modelName "Scenario-constrained GNN" ;
+    cleets:nPredictions 352 ;
+    cleets:pooledR2 0.852 ;
+    cleets:r2 0.783 ;
+    cleets:rmse 188.051 ;
+    cleets:scenario "High" .
+
+<https://w3id.org/def/cleets/data#scenario/central> dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> .
+
+<https://w3id.org/def/cleets/data#scenario/high> dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> .
+
+<https://w3id.org/def/cleets/data#scenario/low> dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> .
+
+<https://w3id.org/def/cleets/data#turnover/W06000001> a cleets:ElectrificationArrival ;
+    rdfs:label "Isle of Anglesey age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 11 ;
+    cleets:bevShare2045 0.9586 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000001 ;
+    cleets:residualNonBEV 4.95 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000001/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000001 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9586 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000001/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000001 ;
+    cleets:forTime data:Period2045Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000001/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000001 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000001/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000001 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000002> a cleets:ElectrificationArrival ;
+    rdfs:label "Gwynedd age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 10 ;
+    cleets:bevShare2045 0.9586 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000002 ;
+    cleets:residualNonBEV 7.85 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000002/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000002 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9586 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000002/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000002 ;
+    cleets:forTime data:Period2045Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000002/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000002 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000002/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000002 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000003> a cleets:ElectrificationArrival ;
+    rdfs:label "Conwy age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 7 ;
+    cleets:bevShare2045 0.9595999999999999 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000003 ;
+    cleets:residualNonBEV 7.25 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000003/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000003 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9595999999999999 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000003/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000003 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000003/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000003 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000003/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000003 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000004> a cleets:ElectrificationArrival ;
+    rdfs:label "Denbighshire age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 8 ;
+    cleets:bevShare2045 0.96 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000004 ;
+    cleets:residualNonBEV 5.99 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000004/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000004 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.96 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000004/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000004 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000004/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000004 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000004/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000004 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000005> a cleets:ElectrificationArrival ;
+    rdfs:label "Flintshire age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 9 ;
+    cleets:bevShare2045 0.9606999999999999 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000005 ;
+    cleets:residualNonBEV 9.93 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000005/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000005 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9606999999999999 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000005/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000005 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000005/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000005 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000005/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000005 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000006> a cleets:ElectrificationArrival ;
+    rdfs:label "Wrexham age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 22 ;
+    cleets:bevShare2045 0.9595 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000006 ;
+    cleets:residualNonBEV 8.27 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000006/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000006 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9595 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000006/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000006 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000006/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000006 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000006/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000006 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000008> a cleets:ElectrificationArrival ;
+    rdfs:label "Ceredigion age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 6 ;
+    cleets:bevShare2045 0.9587 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000008 ;
+    cleets:residualNonBEV 5.13 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000008/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000008 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9587 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000008/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000008 ;
+    cleets:forTime data:Period2045Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000008/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000008 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000008/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000008 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000009> a cleets:ElectrificationArrival ;
+    rdfs:label "Pembrokeshire age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 16 ;
+    cleets:bevShare2045 0.9591 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000009 ;
+    cleets:residualNonBEV 8.86 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000009/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000009 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9591 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000009/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000009 ;
+    cleets:forTime data:Period2045Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000009/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000009 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000009/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000009 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000010> a cleets:ElectrificationArrival ;
+    rdfs:label "Carmarthenshire age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 5 ;
+    cleets:bevShare2045 0.9595 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000010 ;
+    cleets:residualNonBEV 12.76 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000010/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000010 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9595 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000010/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000010 ;
+    cleets:forTime data:Period2045Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000010/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000010 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000010/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000010 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000011> a cleets:ElectrificationArrival ;
+    rdfs:label "Swansea age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 19 ;
+    cleets:bevShare2045 0.9601999999999999 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000011 ;
+    cleets:residualNonBEV 14.24 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000011/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000011 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9601999999999999 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000011/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000011 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000011/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000011 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000011/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000011 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000012> a cleets:ElectrificationArrival ;
+    rdfs:label "Neath Port Talbot age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 14 ;
+    cleets:bevShare2045 0.9601000000000001 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000012 ;
+    cleets:residualNonBEV 7.94 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000012/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000012 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9601000000000001 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000012/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000012 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000012/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000012 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000012/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000012 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000013> a cleets:ElectrificationArrival ;
+    rdfs:label "Bridgend age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 2 ;
+    cleets:bevShare2045 0.9615 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000013 ;
+    cleets:residualNonBEV 7.99 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000013/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000013 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9615 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000013/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000013 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000013/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000013 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000013/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000013 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000014> a cleets:ElectrificationArrival ;
+    rdfs:label "Vale of Glamorgan age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 21 ;
+    cleets:bevShare2045 0.9614 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000014 ;
+    cleets:residualNonBEV 7.62 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000014/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000014 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9614 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000014/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000014 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000014/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000014 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000014/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000014 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000015> a cleets:ElectrificationArrival ;
+    rdfs:label "Cardiff age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 4 ;
+    cleets:bevShare2045 0.961 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000015 ;
+    cleets:residualNonBEV 15.7 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000015/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000015 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.961 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000015/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000015 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000015/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000015 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000015/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000015 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000016> a cleets:ElectrificationArrival ;
+    rdfs:label "Rhondda Cynon Taf age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 18 ;
+    cleets:bevShare2045 0.9599 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000016 ;
+    cleets:residualNonBEV 13.18 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000016/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000016 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9599 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000016/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000016 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000016/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000016 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000016/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000016 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000018> a cleets:ElectrificationArrival ;
+    rdfs:label "Caerphilly age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 3 ;
+    cleets:bevShare2045 0.96 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000018 ;
+    cleets:residualNonBEV 10.07 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000018/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000018 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.96 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000018/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000018 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000018/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000018 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000018/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000018 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000019> a cleets:ElectrificationArrival ;
+    rdfs:label "Blaenau Gwent age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 1 ;
+    cleets:bevShare2045 0.9593 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000019 ;
+    cleets:residualNonBEV 3.99 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000019/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000019 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9593 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000019/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000019 ;
+    cleets:forTime data:Period2045Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000019/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000019 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000019/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000019 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000020> a cleets:ElectrificationArrival ;
+    rdfs:label "Torfaen age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 20 ;
+    cleets:bevShare2045 0.9598 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000020 ;
+    cleets:residualNonBEV 5.45 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000020/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000020 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9598 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000020/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000020 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000020/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000020 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000020/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000020 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000021> a cleets:ElectrificationArrival ;
+    rdfs:label "Monmouthshire age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 13 ;
+    cleets:bevShare2045 0.9614 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000021 ;
+    cleets:residualNonBEV 6.37 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000021/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000021 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9614 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000021/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000021 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000021/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000021 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000021/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000021 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000022> a cleets:ElectrificationArrival ;
+    rdfs:label "Newport age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 15 ;
+    cleets:bevShare2045 0.9611 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000022 ;
+    cleets:residualNonBEV 8.32 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000022/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000022 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9611 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000022/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000022 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000022/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000022 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000022/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000022 ;
+    cleets:forTime data:Period2049Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000023> a cleets:ElectrificationArrival ;
+    rdfs:label "Powys age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 17 ;
+    cleets:bevShare2045 0.9589 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000023 ;
+    cleets:residualNonBEV 10.12 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000023/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000023 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9589 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000023/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000023 ;
+    cleets:forTime data:Period2045Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000023/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000023 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000023/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000023 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000024> a cleets:ElectrificationArrival ;
+    rdfs:label "Merthyr Tydfil age-structured turnover trajectory (2032 phase-out, median scrappage 14 years)" ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:arrivalRank 12 ;
+    cleets:bevShare2045 0.9595999999999999 ;
+    cleets:bevShareEnd 0.9998999999999999 ;
+    cleets:forLAD data:W06000024 ;
+    cleets:residualNonBEV 3.06 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000024/2045Q4> a cleets:EVAdoptionPrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000024 ;
+    cleets:forTime data:Period2045Q4 ;
+    cleets:predictedAdoptionShare 0.9595999999999999 ;
+    cleets:scenario "ban2032-median14y" .
+
+<https://w3id.org/def/cleets/data#turnover/W06000024/milestone/950> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000024 ;
+    cleets:forTime data:Period2045Q2 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.95 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000024/milestone/990> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000024 ;
+    cleets:forTime data:Period2048Q3 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.99 .
+
+<https://w3id.org/def/cleets/data#turnover/W06000024/milestone/995> a cleets:AdoptionMilestonePrediction ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:forLAD data:W06000024 ;
+    cleets:forTime data:Period2049Q4 ;
+    cleets:scenario "ban2032-median14y" ;
+    cleets:thresholdShare 0.995 .
+
+<https://w3id.org/def/cleets/data#turnover/wales/ceiling/12y> a cleets:TurnoverCeiling ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:bevShare2045 0.9883 ;
+    cleets:impliedAnnualReplacementPct 8.42 ;
+    cleets:medianScrappageYears 12.0 ;
+    cleets:residualNonBEV 21726.83 ;
+    cleets:shortfallFrom100pp 1.17 .
+
+<https://w3id.org/def/cleets/data#turnover/wales/ceiling/14y> a cleets:TurnoverCeiling ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:bevShare2045 0.96 ;
+    cleets:impliedAnnualReplacementPct 7.21 ;
+    cleets:medianScrappageYears 14.0 ;
+    cleets:residualNonBEV 73959.0 ;
+    cleets:shortfallFrom100pp 4.0 .
+
+<https://w3id.org/def/cleets/data#turnover/wales/ceiling/16y> a cleets:TurnoverCeiling ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    prov:wasGeneratedBy <https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> ;
+    cleets:bevShare2045 0.915 ;
+    cleets:impliedAnnualReplacementPct 6.31 ;
+    cleets:medianScrappageYears 16.0 ;
+    cleets:residualNonBEV 157308.53 ;
+    cleets:shortfallFrom100pp 8.5 .
+
+data:Period2034Q2 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2034-Q2" ;
+    cleets:quarter 2 ;
+    cleets:year 2034 ;
+    cleets:yearQuarter "2034-Q2" .
+
+data:Period2035Q3 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2035-Q3" ;
+    cleets:quarter 3 ;
+    cleets:year 2035 ;
+    cleets:yearQuarter "2035-Q3" .
+
+data:Period2035Q4 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2035-Q4" ;
+    cleets:quarter 4 ;
+    cleets:year 2035 ;
+    cleets:yearQuarter "2035-Q4" .
+
+data:Period2036Q1 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2036-Q1" ;
+    cleets:quarter 1 ;
+    cleets:year 2036 ;
+    cleets:yearQuarter "2036-Q1" .
+
+data:Period2036Q3 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2036-Q3" ;
+    cleets:quarter 3 ;
+    cleets:year 2036 ;
+    cleets:yearQuarter "2036-Q3" .
+
+data:Period2037Q3 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2037-Q3" ;
+    cleets:quarter 3 ;
+    cleets:year 2037 ;
+    cleets:yearQuarter "2037-Q3" .
+
+data:Period2037Q4 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2037-Q4" ;
+    cleets:quarter 4 ;
+    cleets:year 2037 ;
+    cleets:yearQuarter "2037-Q4" .
+
+data:Period2038Q1 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2038-Q1" ;
+    cleets:quarter 1 ;
+    cleets:year 2038 ;
+    cleets:yearQuarter "2038-Q1" .
+
+data:Period2037Q2 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2037-Q2" ;
+    cleets:quarter 2 ;
+    cleets:year 2037 ;
+    cleets:yearQuarter "2037-Q2" .
+
+cleets:CovariateEffect a owl:Class ;
+    rdfs:label "Covariate effect"@en ;
+    rdfs:comment "Meta-regression coefficient of a covariate on the diffusion midpoint (hierarchical model)."@en .
+
+cleets:TurnoverCeiling a owl:Class ;
+    rdfs:label "Turnover ceiling"@en ;
+    rdfs:comment "Wales-wide BEV share ceiling at 2045 Q4 for one median scrappage age."@en .
+
+data:Period2034Q3 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2034-Q3" ;
+    cleets:quarter 3 ;
+    cleets:year 2034 ;
+    cleets:yearQuarter "2034-Q3" .
+
+data:Period2034Q4 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2034-Q4" ;
+    cleets:quarter 4 ;
+    cleets:year 2034 ;
+    cleets:yearQuarter "2034-Q4" .
+
+data:Period2035Q1 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2035-Q1" ;
+    cleets:quarter 1 ;
+    cleets:year 2035 ;
+    cleets:yearQuarter "2035-Q1" .
+
+data:Period2035Q2 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2035-Q2" ;
+    cleets:quarter 2 ;
+    cleets:year 2035 ;
+    cleets:yearQuarter "2035-Q2" .
+
+data:Period2045Q3 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2045-Q3" ;
+    cleets:quarter 3 ;
+    cleets:year 2045 ;
+    cleets:yearQuarter "2045-Q3" .
+
+<https://w3id.org/def/cleets/data#activity/diffusion-q2026rev> dcterms:bibliographicCitation "Companion notebook to \"Predicting EV adoption in Wales using Semantic Knowledge Graph\" (manuscript, 2026), Stage 6 (bounded logistic scenario fit) and Stage 15 (Prediction KG export); paper S2.3.6, S3.4.3, S3.5."@en ;
+    cleets:notebookStage "Stages 6 and 15" ;
+    cleets:paperSection "S2.3.6, S3.4.3, S3.5" .
+
+data:Period2049Q3 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2049-Q3" ;
+    cleets:quarter 3 ;
+    cleets:year 2049 ;
+    cleets:yearQuarter "2049-Q3" .
+
+data:Period2049Q4 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2049-Q4" ;
+    cleets:quarter 4 ;
+    cleets:year 2049 ;
+    cleets:yearQuarter "2049-Q4" .
+
+data:Period2045Q2 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2045-Q2" ;
+    cleets:quarter 2 ;
+    cleets:year 2045 ;
+    cleets:yearQuarter "2045-Q2" .
+
+<https://w3id.org/def/cleets/data#activity/neural-2026-09-16> a prov:Activity ;
+    rdfs:label "Scenario-constrained neural and graph neural forecasts"@en ;
+    dcterms:bibliographicCitation "Companion notebook to \"Predicting EV adoption in Wales using Semantic Knowledge Graph\" (manuscript, 2026), Stages 6e, 13, 14; paper S2.3.2-S2.3.4, S3.4.1 (Tables 5-7). Values taken from: companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb."@en ;
+    dcterms:source "companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb" ;
+    rdfs:comment "Stages 6e, 13 and 14 of the companion notebook, quarterly revision (paper S2.3.2-S2.3.4, S3.4.1, Tables 5-7). A multilayer perceptron (quarter index -> level), a scenario-constrained perceptron (quarter index and capacity K as inputs), a two-layer graph convolutional network over a 22-node LAD similarity graph, its scenario-constrained variant, a persistence-plus-drift baseline (last value plus the mean quarterly change over the preceding four quarters) and the bounded logistic of Stage 13 are evaluated on one quarterly LAD panel extracted from the released KG by SPARQL (Listing 1) under a single rolling-origin one-step-ahead protocol: every quarter from 2022 Q1 to the end of the panel is held out in turn, the model trains on everything before it, only LADs with at least eight training quarters enter a fold, giving 352 held-out LAD-quarters per configuration for both targets (private BEV keepership, VEH0132; public charging devices, EVCI9001). Scenario capacity follows the revised Equation 2, K = alpha x the last TRAINING observation with alpha = 6 (low), 10 (central) and 15 (high), so no post-training value enters any fit. Mean R2 is the mean of per-LAD R2; pooled R2 over all held-out LAD-quarters is reported alongside. Stage 6e additionally trains a small feed-forward network on the quarterly matched-scope adoption ratio and scores it on first differences against persistence and linear drift. Charger counts are excluded as adoption features. The printed notebook tables give evaluation metrics only; no network forecast to 2045 is produced, the bounded logistic remains the forecasting instrument."@en ;
+    prov:endedAtTime "2026-09-16"^^xsd:date ;
+    prov:used <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    cleets:notebookStage "Stages 6e, 13, 14" ;
+    cleets:paperSection "S2.3.2-S2.3.4, S3.4.1 (Tables 5-7)" .
+
+cleets:ChargingConstraintAssessment a owl:Class ;
+    rdfs:label "Charging-constraint assessment"@en ;
+    rdfs:comment "Per-LAD classification of whether public charging provision plausibly binds adoption by 2045 under stated assumptions."@en .
+
+cleets:CovariateResidual a owl:Class ;
+    rdfs:label "Covariate residual"@en ;
+    rdfs:comment "Observed adoption minus the cross-sectional Ridge prediction from population, density and area."@en .
+
+cleets:DiffusionParameterEstimate a owl:Class ;
+    rdfs:label "Diffusion parameter estimate"@en ;
+    rdfs:comment "Per-LAD logistic-curve parameters from the hierarchical model. Not an observed value."@en .
+
+cleets:ElectrificationArrival a owl:Class ;
+    rdfs:label "Electrification arrival estimate"@en ;
+    rdfs:comment "Per-LAD BEV share and residual non-BEV stock from the age-structured turnover trajectory. A ceiling, not an observed value."@en .
+
+data:Period2048Q3 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2048-Q3" ;
+    cleets:quarter 3 ;
+    cleets:year 2048 ;
+    cleets:yearQuarter "2048-Q3" .
+
+<https://w3id.org/def/cleets/data#activity/charging-2026-09-16> a prov:Activity ;
+    rdfs:label "Charging-provision constraint classification (2045)"@en ;
+    dcterms:bibliographicCitation "Companion notebook to \"Predicting EV adoption in Wales using Semantic Knowledge Graph\" (manuscript, 2026), Stage 8; paper Discussion (charging provision), Stage 8 outputs. Values taken from: companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb."@en ;
+    dcterms:source "companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb" ;
+    rdfs:comment "Stage 8, research question 2 of the companion notebook. Each LAD's 2045 BEV count from the turnover trajectory is set against public charging devices grown at 5% a year for 20 years ('slow' scenario) and a benchmark of 20 BEVs per public device. LADs that diffuse slowly AND fall short of the benchmark are classed as 'charging plausibly binding'; the rest as 'provision will bind later'. Sensitivity: frozen, slow and sustained (12%/yr) charger growth all leave every LAD below the benchmark. Assumption-driven; not an official forecast."@en ;
+    prov:endedAtTime "2026-09-16"^^xsd:date ;
+    prov:used <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    cleets:notebookStage "Stage 8" ;
+    cleets:paperSection "Discussion (charging provision), Stage 8 outputs" .
+
+<https://w3id.org/def/cleets/data#activity/hierarchical-2026-09-16> a prov:Activity ;
+    rdfs:label "Hierarchical diffusion (two-stage empirical Bayes)"@en ;
+    dcterms:bibliographicCitation "Companion notebook to \"Predicting EV adoption in Wales using Semantic Knowledge Graph\" (manuscript, 2026), Stage 11; paper S2.3.6, S3.5 (Table 9, Figures 4-5). Values taken from: companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb."@en ;
+    dcterms:source "companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb" ;
+    rdfs:comment "Stage 11 of the companion notebook (paper S2.3.6, S3.5, Table 9, Figures 4-5). Each LAD's logistic curve is fitted independently, the fitted rate and midpoint are meta-regressed on standardised covariates (population density, population) with a DerSimonian-Laird between-LAD variance, and each LAD is shrunk toward its covariate prediction in proportion to how noisily it was estimated. Evaluated on first differences of the adoption share. Outputs: per-LAD midpoint period, rate per quarter, 95% interval width, shrinkage weight and lag against the Welsh median."@en ;
+    prov:endedAtTime "2026-09-16"^^xsd:date ;
+    prov:used <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    cleets:notebookStage "Stage 11" ;
+    cleets:paperSection "S2.3.6, S3.5 (Table 9, Figures 4-5)" .
+
+cleets:ModelMetric a owl:Class ;
+    rdfs:label "Model evaluation metric"@en ;
+    rdfs:comment "Walk-forward or leave-one-out error metric for one model configuration."@en .
+
+<https://w3id.org/def/cleets/data#activity/covariates-2026-09-16> a prov:Activity ;
+    rdfs:label "Cross-sectional covariate comparison (leave-one-out)"@en ;
+    dcterms:bibliographicCitation "Companion notebook to \"Predicting EV adoption in Wales using Semantic Knowledge Graph\" (manuscript, 2026), Stages 4a-bis, 5; paper S3.4.2 (Table 8). Values taken from: companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb."@en ;
+    dcterms:source "companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb" ;
+    rdfs:comment "Stages 4a-bis and 5 of the companion notebook (paper S3.4.2, Table 8). Node features per LAD (population, population density, land area; chargers and EV counts are extracted but charger features are excluded from the predictors) are used to predict EVs per 1,000 residents at the target quarter with a mean baseline, Ridge, Random Forest, Extra Trees, GCN, GAT and GraphSAGE under leave-one-out evaluation over the 22 LADs, stochastic models refit under five seeds. The seed spread is at least as large as the gap between the best model and the mean baseline, so no single winning architecture is reported. Ridge residuals rank which LADs adopt above or below what population, density and area alone would predict."@en ;
+    prov:endedAtTime "2026-09-16"^^xsd:date ;
+    prov:used <https://w3id.org/def/cleets/data#dataset/EVCI9001>,
+        <https://w3id.org/def/cleets/data#dataset/ONSDensity>,
+        <https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    cleets:notebookStage "Stages 4a-bis, 5" ;
+    cleets:paperSection "S3.4.2 (Table 8)" .
+
+data:Period2045Q4 a cleets:Quarter,
+        cleets:Time ;
+    rdfs:label "2045-Q4" ;
+    cleets:quarter 4 ;
+    cleets:year 2045 ;
+    cleets:yearQuarter "2045-Q4" .
+
+<https://w3id.org/def/cleets/data#dataset/ONSDensity> a dcat:Dataset ;
+    rdfs:label "ONSDensity" ;
+    dcterms:bibliographicCitation "Office for National Statistics (2025) Population density (persons per square kilometre), England and Wales [Data set]. Available at: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates"@en ;
+    dcterms:identifier "ONSDensity" ;
+    dcterms:license <https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/> ;
+    dcterms:publisher "Office for National Statistics"@en ;
+    dcterms:title "Population density (persons per square kilometre), England and Wales"@en ;
+    dcat:landingPage <https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates> .
+
+<https://w3id.org/def/cleets/data#dataset/StatsWalesPopulation> a dcat:Dataset ;
+    rdfs:label "StatsWalesPopulation" ;
+    dcterms:bibliographicCitation "Welsh Government (2025) Population estimates by local authority and year (mid-year estimates) [Data set]. StatsWales. Available at: https://stats.gov.wales/en-GB/topic/71/people-identity-equality"@en ;
+    dcterms:identifier "StatsWalesPopulation" ;
+    dcterms:license <https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/> ;
+    dcterms:publisher "Welsh Government"@en ;
+    dcterms:title "Population estimates by local authority and year (mid-year estimates)"@en ;
+    dcat:landingPage <https://stats.gov.wales/en-GB/topic/71/people-identity-equality> .
+
+<https://w3id.org/def/cleets/data#dataset/EVCI9001> a dcat:Dataset ;
+    rdfs:label "EVCI9001" ;
+    dcterms:bibliographicCitation "Department for Transport (2026) EVCI9001: Public EV charging devices: United Kingdom (historic table, updated quarterly) [Data set]. Electric vehicle charging infrastructure statistics: data tables. Available at: https://www.gov.uk/government/statistical-data-sets/electric-vehicle-charging-infrastructure-statistics-data-tables-evci"@en ;
+    dcterms:identifier "EVCI9001" ;
+    dcterms:license <https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/> ;
+    dcterms:publisher "Department for Transport / Office for Zero Emission Vehicles"@en ;
+    dcterms:title "EVCI9001: Public EV charging devices: United Kingdom (historic table, updated quarterly)"@en ;
+    dcat:landingPage <https://www.gov.uk/government/collections/electric-vehicle-charging-infrastructure-statistics> .
+
+<https://w3id.org/def/cleets/data#activity/turnover-2026-09-16> a prov:Activity ;
+    rdfs:label "Age-structured fleet turnover under a 2032 new-sales phase-out"@en ;
+    dcterms:bibliographicCitation "Companion notebook to \"Predicting EV adoption in Wales using Semantic Knowledge Graph\" (manuscript, 2026), Stages 7-9; paper S2.3.5, S3.6, S3.8 (Table 10, Figures 6-7). Values taken from: companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb."@en ;
+    dcterms:source "companion notebook cell outputs: CLEETS_EV_Adoption_Wales_Quarterly.ipynb" ;
+    rdfs:comment "Stages 7-9 of the companion notebook (paper S2.3.5, S3.6, S3.8, Table 10, Figures 6-7). New non-BEV private registrations decline linearly to zero by 2032 Q4 and all replacement registrations are BEV from 2033 Q1; each LAD's private vehicle stock is held at its latest VEH0105 value; vehicles retire under a Weibull survival curve calibrated on median scrappage age (12, 14 and 16 years; central 14) rather than a constant hazard, and the observed BEV vintages are carried forward cohort by cohort to 2053 Q4. The result is a ceiling, not a forecast: it assumes every new private vehicle from the ban onward is a BEV. Outputs: BEV share at 2045 Q4 and 2053 Q4, residual non-BEV stock, and the first quarter at which 95%, 99% and 99.5% BEV share is reached."@en ;
+    prov:endedAtTime "2026-09-16"^^xsd:date ;
+    prov:used <https://w3id.org/def/cleets/data#dataset/VEH0105>,
+        <https://w3id.org/def/cleets/data#dataset/VEH0132> ;
+    cleets:notebookStage "Stages 7-9" ;
+    cleets:paperSection "S2.3.5, S3.6, S3.8 (Table 10, Figures 6-7)" .
+
+<https://w3id.org/def/cleets/data#dataset/VEH0105> dcterms:identifier "VEH0105" ;
+    dcterms:license <https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/> .
+
+<https://w3id.org/def/cleets/data#dataset/VEH0132> dcterms:identifier "VEH0132" ;
+    dcterms:license <https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/> .
+

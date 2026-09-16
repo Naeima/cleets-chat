@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cleets-chat"
+version = "1.1.0"
+description = "CLEETS-CHAT: cited, evidence-bounded question answering over the CLEETS knowledge graphs of EV adoption in Wales"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Naeima Hamed", email = "naeima.hamed@gmail.com"}
+]
+keywords = [
+    "knowledge-graph", "rdf", "sparql", "chatbot", "qa",
+    "ev-adoption", "wales", "dash", "plotly", "anthropic"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+dependencies = [
+    "dash>=2.14.0",
+    "plotly>=5.14.0",
+    "pandas>=2.0.0",
+    "rdflib>=7.0.0",
+    "anthropic>=0.31.0",
+    "python-dotenv>=1.0.0",
+    "gunicorn>=21.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "isort>=5.12.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/cleets-chat"
+Documentation = "https://github.com/yourusername/cleets-chat/tree/main/docs"
+Repository = "https://github.com/yourusername/cleets-chat.git"
+Issues = "https://github.com/yourusername/cleets-chat/issues"
+
+[tool.setuptools]
+py-modules = ["app", "kg_service", "qa", "qa_with_humanization", "methods", "about", "build_prediction_families", "build_site", "analyze_feedback", "evaluate_answers"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
