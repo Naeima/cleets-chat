@@ -243,4 +243,4 @@ CLEETS is funded under an NSF–UKRI Global Centre (NSF award 2330565, UKRI gran
 
 ## Contact
 
-Naeima Hamed, Cardiff University: naeima.hamed@gmail.com. Issues and pull requests are welcome.
+Naeima Hamed, Cardiff University: hamdnh@cardiff.ac.uk and nhamed@illinois.edu. Issues and pull requests are welcome.
