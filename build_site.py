@@ -83,7 +83,7 @@ def main():
     (DOCS / "data" / "site_meta.json").write_text(json.dumps(meta, separators=(",", ":")), encoding="utf-8")
 
     # 3. Python modules executed by Pyodide in the browser (copies of the root modules)
-    for name in ("kg_service.py", "qa_with_humanization.py", "qa.py", "methods.py", "about.py"):
+    for name in ("kg_service.py", "qa_with_humanization.py", "qa.py", "methods.py", "scope.py", "about.py"):
         shutil.copy(HERE / name, DOCS / "py" / name)
 
     # 4. README: the "About CLEETS-CHAT" block between the markers is regenerated from the graphs
@@ -101,7 +101,7 @@ def main():
 
     print(f"docs/data/kg_snapshot.json  {(DOCS / 'data' / 'kg_snapshot.json').stat().st_size / 1e6:.1f} MB")
     print(f"docs/data/site_meta.json    {(DOCS / 'data' / 'site_meta.json').stat().st_size / 1e3:.0f} kB")
-    print("docs/py/                    kg_service.py qa_with_humanization.py qa.py methods.py about.py")
+    print("docs/py/                    kg_service.py qa_with_humanization.py qa.py methods.py scope.py about.py")
     print("Prediction types:", ", ".join(f["key"] for f in fams))
 
 

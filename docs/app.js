@@ -152,11 +152,12 @@ function toggleLad(lad) {
 async function loadPython() {
   const t0 = performance.now();
   const py = await loadPyodide();
+  const PY_MODULES = ["kg_service.py", "qa_with_humanization.py", "qa.py", "methods.py", "scope.py"];
   const [snap, ...mods] = await Promise.all([
     fetch("data/kg_snapshot.json").then((r) => r.text()),
-    ...["kg_service.py", "qa_with_humanization.py", "qa.py", "methods.py"].map((n) => fetch("py/" + n).then((r) => r.text())),
+    ...PY_MODULES.map((n) => fetch("py/" + n).then((r) => r.text())),
   ]);
-  ["kg_service.py", "qa_with_humanization.py", "qa.py", "methods.py"].forEach((n, i) => py.FS.writeFile("/home/pyodide/" + n, mods[i]));
+  PY_MODULES.forEach((n, i) => py.FS.writeFile("/home/pyodide/" + n, mods[i]));
   py.FS.writeFile("/home/pyodide/kg_snapshot.json", snap);
   await py.runPythonAsync(`
 import sys, json

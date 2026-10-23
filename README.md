@@ -9,7 +9,7 @@ Question answering over the CLEETS knowledge graphs of electric-vehicle adoption
 <!-- about:start -->
 ## About CLEETS-CHAT
 
-CLEETS-CHAT is a question-answering assistant for electric-vehicle (EV) adoption in Wales. It answers free-text questions from two knowledge graphs, not from a language model's memory: the observed graph CLEETS-KG-Enriched (6,314 observations of 9 measures for the 22 Welsh local authority districts, 2009 to 2026) and the CLEETS Prediction KG (5,280 quarterly scenario forecasts to 2045 and the 6 prediction types of the companion paper). Every answer is assembled from retrieved statements or from calculations the system performs on them, names the dataset behind each value, states whether a value is observed, calculated or predicted, and explains how each prediction was generated. Stakeholders can extract custom district tables, plot them on the map, download them as CSV and score every answer.
+CLEETS-CHAT is a question-answering assistant for electric-vehicle (EV) adoption in Wales. It answers free-text questions from two knowledge graphs rather than from a language model's memory: the observed graph CLEETS-KG-Enriched (6,314 observations of 9 measures for the 22 Welsh local authority districts, 2009 to 2026) and the CLEETS Prediction KG (5,280 quarterly scenario forecasts to 2045 and the 6 prediction types of the companion paper). Every answer is assembled from retrieved statements or from calculations the system performs on them, names the dataset behind each value, states whether a value is observed, calculated or predicted, and explains how each prediction was generated. Stakeholders can extract custom district tables, plot them on the map, download them as CSV and score every answer.
 
 ### Built on an ontology-based knowledge graph
 
@@ -65,6 +65,7 @@ Companion paper: Predicting EV adoption in Wales using Semantic Knowledge Graph 
 | ⓘ How was this predicted? | A panel under every prediction answer describing the method, its assumptions, the source datasets and the paper section and notebook stage that produced it (`methods.py`, values filled from the graph). |
 | Custom datasets | "Give me a table of keepership, charging count, deprivation, population and population density for the 22 LADs" (or the builder panel) yields a per-district table with its sources, a CSV download, and a map coloured by any column. |
 | Map | OpenStreetMap view of the 22 districts coloured by observed, predicted or custom-dataset metrics; clicking a district pre-fills a question and adds it to the dataset selection. |
+| Scope check | Before any retrieval, `scope.py` tests the question against what the loaded graphs hold (district names, measures, prediction types, dataset records and ontology terms, all read from the graphs). A question outside them, "What is the weather in Cardiff?", "How much does a charger cost?", "How many EVs are in Birmingham?", "What is Cardiff's keepership in 2060?", is answered with *Not modelled in the knowledge graph*, a one-line reason naming the missing dataset, geography or period, and what the graphs do cover. |
 | Humanisation (optional) | With `ANTHROPIC_API_KEY` set, the prose of templated answers is reworded by Claude under a constraint prompt; figures, tables and citations are never passed through the model. Off by default. |
 | Feedback | Every answer can be scored 1–10 with notes; stored in `cleets_feedback.db` and analysed by `analyze_feedback.py` (the static site keeps scores in the browser and exports them as CSV). |
 
@@ -112,7 +113,7 @@ The ⓘ button next to the question box lists example questions per family (obse
 - `Which model is most accurate for EV chargers?` (ranks every approach of Table 7 by backtest error, with the Stage 13 logistic run)
 - `What do you know about Cardiff?` · `Which LAD has the most public EV chargers?` · `Which dataset supports this answer?` · `Are all resources properly cited?`
 
-Answers end with a **Sources** line built from the graph (dataset landing pages and the CLEETS knowledge graph) and, for predictions, the prediction type and the ⓘ panel. When no statement matches, the system says so rather than inferring. `Are all resources properly cited?` runs `CLEETSKG.citation_audit()`: it checks that every observation, prediction, family resource and activity in the loaded graphs reaches a complete `dcat:Dataset` record (identifier, title, publisher, licence, bibliographic citation, landing page) and prints the citations.
+Answers end with a **Sources** line built from the graph (dataset landing pages and the CLEETS knowledge graph) and, for predictions, the prediction type and the ⓘ panel. A question whose subject is not in the graphs is not answered with unrelated evidence: the scope check (`scope.py`) replies *Not modelled in the knowledge graph* and says why in a line, distinguishing an unmodelled topic (prices, emissions, charger speeds, fuel types, weather, finer geographies, ...; the reason names the dataset that would have been needed), a place outside the 22 Welsh districts (English districts are reported with what the graph holds for them, population density only), a year outside the observed or predicted periods, and a question that names nothing held in the graphs. Greetings and questions about the assistant itself get a short description of what it can answer. `Are all resources properly cited?` runs `CLEETSKG.citation_audit()`: it checks that every observation, prediction, family resource and activity in the loaded graphs reaches a complete `dcat:Dataset` record (identifier, title, publisher, licence, bibliographic citation, landing page) and prints the citations.
 
 ## How it was built (reproducibility)
 
@@ -175,6 +176,7 @@ python build_site.py     # rebuild docs/ after changing the graphs or the Python
 app.py                         Dash dashboard (map, chatbot, ⓘ panels, dataset builder, scoring)
 kg_service.py                  rdflib access layer, indexes, prediction families, dataset extraction, JSON snapshot
 qa.py / qa_with_humanization.py  deterministic question answering; optional Claude rewording
+scope.py                       scope check: "not modelled in the knowledge graph" answers, with the reason, for questions outside the graphs
 methods.py                     "how was this predicted" texts per prediction type
 about.py                       "About CLEETS-CHAT" text; datasets and figures filled from the graph (also refreshes the README block)
 build_prediction_families.py   notebook outputs / CSV exports -> data/cleets_prediction_families.ttl
@@ -239,6 +241,7 @@ CLEETS is funded under an NSF–UKRI Global Centre (NSF award 2330565, UKRI gran
 - The question-answering path is rule- and template-based: it answers the families listed in the help panel and declines the rest; it does not generate text. Optional humanisation uses a language model for wording only.
 - Predictions are model outputs under stated assumptions (the 2045 terminal shares, the 2032 phase-out, the scrappage curve); the chatbot labels them as such. Values reflect the notebook run that produced the graphs; the notebook's paper parity check lists where a run differs from the manuscript.
 - Retrieval in Actual Data mode is keyword-based over the indexed measures; unusual phrasings may need the wording of the help panel.
+- The scope check is vocabulary-based: district names, measures, prediction types, datasets and ontology terms come from the graphs, the rest from small lexicons in `scope.py` (synonyms, stop words, a curated list of unmodelled topics). A term it does not recognise is reported as not modelled with a pointer to the help panel; adding a dataset to the graph makes its measure answerable, but a new synonym for it has to be added to the lexicon.
 - The GitHub Pages build loads a 6 MB snapshot and a Python runtime on first visit; scores entered there stay in the visitor's browser.
 
 ## Contact

@@ -15,6 +15,8 @@ this module re-exports it so both import styles work:
 from qa_with_humanization import *  # noqa: F401,F403
 from qa_with_humanization import (  # noqa: F401
     ONTOLOGY,
+    check_scope,
+    wants_kg_description,
     get_client,
     md_links,
     md_table,

@@ -9,6 +9,12 @@ try:
 except ImportError:  # methods.py is optional
     METHODS, FAMILY_SHORT = {}, {}
 
+try:
+    from scope import check_scope
+except ImportError:  # scope.py is optional: without it every question is routed to the answerers
+    def check_scope(kg, question, mode="actual", family=None):  # noqa: D103
+        return None
+
 ONTOLOGY = "https://w3id.org/def/cleets"
 
 # Model used for humanisation; override with CLEETS_LLM_MODEL in .env if needed.
@@ -716,7 +722,10 @@ def diffusion_answer(kg, question, humanize: bool = False):
         return (f"### Wales prediction summary — {year}, {scenario} scenario\n\n{body}\n\n**Sources:** {md_links(src)}"
                 + _method_footer(kg, fam))
 
-    return "I could not map that free-text question to prediction evidence currently present in the KG. Try naming a LAD, year, scenario, ranking or provenance request."
+    return ("### Not found in the prediction knowledge graph\n\nNo prediction resource in the loaded graph matches that question "
+            f"(year {year}, {scenario} scenario), and CLEETS-CHAT does not infer an unsupported answer. Name a district, a year "
+            "within the forecast horizon, a scenario, a ranking or a provenance request (the ⓘ button lists example "
+            f"questions).\n\n**Knowledge graph:** [CLEETS]({ONTOLOGY})")
 
 
 def hierarchical_answer(kg, question, humanize: bool = False):
@@ -1019,6 +1028,17 @@ def prediction_answer(kg, question, humanize: bool = False, family: str = None):
     return FAMILY_ANSWERERS[fam](kg, question, humanize=humanize), fam
 
 
+def wants_kg_description(question: str) -> bool:
+    """Questions about the knowledge graph itself (what it is, its ontology, classes and properties); answered from the
+    observed graph in either mode, so Prediction mode never returns a forecast summary for them."""
+    q = question.casefold().strip()
+    if "ontology" in q or "what is cleets" in q or "what's cleets" in q:
+        return True
+    if "knowledge graph" in q and q.startswith(("what is", "what's", "describe", "explain", "tell me about", "what does")):
+        return True
+    return any(w in q for w in ("class", "properties", "property", "vocabulary")) and ("cleets" in q or "kg" in q.split())
+
+
 def actual_answer(kg, question, humanize: bool = False):
     q = question.casefold()
     if "ontology" in q or "what is cleets" in q or (q.startswith("what is") and "knowledge graph" in q):
@@ -1028,7 +1048,9 @@ def actual_answer(kg, question, humanize: bool = False):
 
     rows = list(kg.actual_search(question, limit=30))
     if not rows:
-        return "I could not find supporting RDF statements for that free-text question. I will not infer an unsupported answer. Try naming the LAD, measure, year, dataset or knowledge-graph concept."
+        return ("### Not found in the knowledge graph\n\nNo RDF statement in CLEETS-KG-Enriched matches that question, and "
+                "CLEETS-CHAT does not infer an unsupported answer. Name the district, measure, year, dataset or knowledge-graph "
+                f"concept you are after (the ⓘ button lists example questions).\n\n**Knowledge graph:** [CLEETS]({ONTOLOGY})")
 
     # Group top evidence by subject and keep the display concise.
     grouped = defaultdict(list)
@@ -1074,6 +1096,15 @@ def answer_question_rich(kg, question: str, mode: str = "actual", humanize: bool
 
     if wants_citation_audit(q):
         return {"markdown": citation_answer(kg, question), "kind": "inventory", "family": None, "table": None, "columns": None}
+
+    if wants_kg_description(q):
+        return {"markdown": actual_answer(kg, question, humanize=humanize), "kind": "actual", "family": None, "table": None, "columns": None}
+
+    # Scope check before any retrieval: a question outside the graphs gets a "not modelled" answer with the reason
+    # instead of whatever the keyword retrieval would have returned.
+    out_of_scope = check_scope(kg, question, mode=mode, family=family)
+    if out_of_scope is not None:
+        return out_of_scope
 
     if wants_table(q) and not any(w in q for w in ("table 6", "table 7", "table 8", "table 9", "table 10")):
         return table_answer(kg, question, mode)
