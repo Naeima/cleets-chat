@@ -184,6 +184,7 @@ class CLEETSKG:
         self._snapshot = False
         self._build_lad_index()
         self._build_period_index()
+        self._build_other_area_index()
         self._build_family_index()
         self._build_prediction_index()
         self._build_family_resources()
@@ -242,6 +243,56 @@ class CLEETSKG:
             (re.compile(r"(?<![\w-])" + re.escape(a) + r"(?![\w-])", re.IGNORECASE), uri)
             for a, uri in sorted(self._alias.items(), key=lambda kv: -len(kv[0]))
         ]
+
+    def _build_other_area_index(self):
+        """Areas the observed graph holds that are not Welsh LADs (cleets:EnglishLAD): display name ->
+        {uri, code, kind, measures, first, last}. Only the scope check reads this index, so that a question
+        about Birmingham can be answered with what the graph actually holds for it (population density)."""
+        self._other_areas: Dict[str, dict] = {}
+        g = self.observed_kg
+        if g is None:
+            return
+        for uri in g.subjects(RDF.type, CLEETS.EnglishLAD):
+            if uri in self._lads:
+                continue
+            label = str(g.value(uri, RDFS.label) or g.value(uri, SKOS.prefLabel) or "").strip()
+            if not label:
+                continue
+            years: List[int] = []
+            measures = set()
+            for pred, cls in ((CLEETS.hasPopulation, CLEETS.Population), (CLEETS.hasPopulationDensity, CLEETS.PopulationDensity)):
+                for s in g.objects(uri, pred):
+                    measures.add(MEASURE_LABELS[self._measure_key(cls, None)])
+                    d = g.value(s, DCTERMS.date)
+                    if d and str(d)[:4].isdigit():
+                        years.append(int(str(d)[:4]))
+            for s in g.subjects(CLEETS.forLAD, uri):
+                for cls in g.objects(s, RDF.type):
+                    if cls in VALUE_PREDICATES:
+                        key = self._measure_key(cls, g.value(s, CLEETS.observesProperty))
+                        measures.add(MEASURE_LABELS.get(key, key))
+                        t = g.value(s, CLEETS.forTime)
+                        y = self._period(t)[0] if t is not None else None
+                        if y:
+                            years.append(y)
+            self._other_areas[label] = {"uri": str(uri), "code": str(g.value(uri, CLEETS.ladCode) or ""),
+                                        "kind": "English local authority district", "measures": sorted(measures),
+                                        "first": min(years) if years else None, "last": max(years) if years else None,
+                                        "aliases": self._area_aliases(label)}
+
+    @staticmethod
+    def _area_aliases(label: str) -> List[str]:
+        """Shorter forms of an ONS area label: 'Bristol, City of' -> Bristol; 'Bournemouth, Christchurch and Poole'
+        -> Bournemouth, Christchurch, Poole."""
+        out: List[str] = []
+        if "," in label:
+            head, tail = label.split(",", 1)
+            parts = [head] + ([p for p in re.split(r",| and ", tail) if p.strip()] if " and " in tail else [])
+            for p in parts:
+                p = p.strip()
+                if p and p.casefold() not in ("city of", "county of") and p != label:
+                    out.append(p)
+        return out
 
     def _build_period_index(self):
         """Time nodes (both graphs): uri -> (year, quarter or None, label)."""
@@ -585,6 +636,53 @@ class CLEETSKG:
             if uri not in seen:
                 seen.add(uri)
                 out.append((name, uri))
+        return out
+
+    # ----------------------------------------------------------- other areas
+    # Single-word district names that are also ordinary English words: matched only when capitalised and not at the
+    # start of the text, so "Reading the table" or "a bath" never resolves to the English district of that name.
+    AMBIGUOUS_AREA_NAMES = {"reading", "rugby", "bath", "bury", "dover", "hart", "eden", "wells", "swale", "harrow",
+                            "craven", "arun", "adur", "ryedale", "rother", "havant", "lewes", "boston", "lincoln", "york",
+                            "derby", "stafford", "warwick", "melton", "brent", "sutton", "merton"}
+
+    def other_areas(self) -> Dict[str, dict]:
+        """Non-Welsh areas held in the observed graph: {display name: {uri, code, kind, measures, first, last, aliases}}."""
+        return {k: dict(v) for k, v in getattr(self, "_other_areas", {}).items()}
+
+    def find_other_areas_in_text(self, text: str) -> List[Tuple[str, dict]]:
+        """Non-Welsh areas (English LADs) mentioned in free text, in order of appearance, skipping any span
+        already taken by a Welsh LAD name: [(display name, descriptor), ...]."""
+        areas = getattr(self, "_other_areas", {})
+        if not areas or not text:
+            return []
+        patterns = getattr(self, "_other_area_patterns", None)
+        if patterns is None:
+            names = [(name, name) for name in areas] + [(a, name) for name, info in areas.items() for a in info.get("aliases", [])]
+            patterns = []
+            for alias, name in sorted(names, key=lambda kv: -len(kv[0])):
+                ambiguous = alias.casefold() in self.AMBIGUOUS_AREA_NAMES
+                flags = 0 if ambiguous else re.IGNORECASE
+                patterns.append((re.compile(r"(?<![\w-])" + re.escape(alias) + r"(?![\w-])", flags), name, ambiguous))
+            self._other_area_patterns = patterns
+        taken = []
+        for pattern, _ in self._alias_patterns:
+            taken.extend((m.start(), m.end()) for m in pattern.finditer(text))
+        lead = len(text) - len(text.lstrip())
+        found: List[Tuple[int, str]] = []
+        for pattern, name, ambiguous in patterns:
+            for m in pattern.finditer(text):
+                span = (m.start(), m.end())
+                if ambiguous and span[0] == lead:
+                    continue
+                if any(a <= span[0] < b or a < span[1] <= b or (span[0] <= a and b <= span[1]) for a, b in taken):
+                    continue
+                taken.append(span)
+                found.append((m.start(), name, m.group(0)))
+        out, seen = [], set()
+        for _, name, surface in sorted(found):
+            if name not in seen:
+                seen.add(name)
+                out.append((name, {**areas[name], "matched": surface}))
         return out
 
     # -------------------------------------------------------------- predictions
@@ -1216,6 +1314,7 @@ class CLEETSKG:
             "lads": {str(k): v for k, v in self._lads.items()},
             "lad_code": {str(k): v for k, v in self._lad_code.items()},
             "alias": {k: str(v) for k, v in self._alias.items()},
+            "other_areas": self.other_areas(),
             "periods": {str(k): list(v) for k, v in self._periods.items()},
             "families": {k: {**f, "activities": list(f["activities"]), "used": list(f["used"])} for k, f in self._families.items()},
             "pred": [{"lad_uri": str(k[0]), "scenario": k[1], "rows": rows} for k, rows in self._pred.items()],
@@ -1257,6 +1356,7 @@ class CLEETSKG:
             (re.compile(r"(?<![\w-])" + re.escape(a) + r"(?![\w-])", re.IGNORECASE), uri)
             for a, uri in sorted(self._alias.items(), key=lambda kv: -len(kv[0]))
         ]
+        self._other_areas = dict(data.get("other_areas", {}))
         self._periods = {k: tuple(v) for k, v in data["periods"].items()}
         self._families = data["families"]
         self._activity_family = {a: k for k, f in self._families.items() for a in f["activities"]}

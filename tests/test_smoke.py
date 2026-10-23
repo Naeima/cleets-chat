@@ -42,7 +42,8 @@ def test_every_help_question_answers(kg, question_groups):
                 r = qa.answer_question_rich(kg, q, mode=mode)
                 assert r["markdown"].strip(), (mode, q)
                 assert not r["markdown"].startswith("### Query error"), (mode, q, r["markdown"][:200])
-                assert not r["markdown"].startswith("I could not"), (mode, q)
+                assert not r["markdown"].startswith(("I could not", "### Not found", "### Not modelled")), (mode, q)
+                assert r["kind"] not in ("scope", "meta"), (mode, q, r["markdown"][:200])
 
 
 def test_prediction_answers_cite_sources_and_type(kg):
