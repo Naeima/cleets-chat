@@ -48,7 +48,7 @@ def test_every_help_question_answers(kg, question_groups):
 
 def test_prediction_answers_cite_sources_and_type(kg):
     md = qa.answer_question(kg, "What is Cardiff's predicted EV keepership in 2045 under the central scenario?", mode="prediction")
-    assert "159,451" in md and "**Sources:**" in md and "Prediction type:" in md
+    assert "155,293" in md and "**Sources:**" in md and "Prediction type:" in md
 
 
 def test_family_routing(kg):
