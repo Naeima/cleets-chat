@@ -4,7 +4,7 @@ CLEETS-CHAT: Cited and Hallucination-Free AI with Traceability
 
 Single-entry dashboard:
   * Header with the CLEETS logo (assets/cleets_logo.png) and live KG statistics
-  * OpenStreetMap view of the 22 Welsh LADs coloured by an observed, predicted or
+  * Map view (Esri light grey base map) of the 22 Welsh LADs coloured by an observed, predicted or
     custom-dataset metric (click a district to pre-fill a question and to add it
     to the dataset selection)
   * Free-text question answering over the observed graph (CLEETS-KG-Enriched)
@@ -389,7 +389,12 @@ def build_map(metric_key: str, custom: dict = None) -> go.Figure:
                                   outlinewidth=0, tickfont=dict(size=11))),
         hovertext=hover, hoverinfo="text", customdata=names,
     )
-    view = dict(style="open-street-map", center=dict(lat=52.42, lon=-3.85), zoom=6.75)
+    # Esri Light Gray Canvas draws no road network at country scale, so the
+    # markers read cleanly; it needs no API key. The static site offers the
+    # same base map with a control for terrain, OpenStreetMap and satellite.
+    view = dict(style="white-bg", center=dict(lat=52.42, lon=-3.85), zoom=6.75,
+                layers=[dict(below="traces", sourcetype="raster", sourceattribution="Tiles &copy; Esri &mdash; Light Gray Canvas",
+                             source=["https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"])])
     # Plotly >= 5.24 uses MapLibre traces (Scattermap); older versions use Scattermapbox.
     if hasattr(go, "Scattermap"):
         fig = go.Figure(go.Scattermap(**trace_kwargs))
@@ -545,7 +550,7 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.Div("Map the data", style={"fontSize": "21px", "fontWeight": 700}),
-                html.Div("OpenStreetMap view of the 22 Welsh local authority districts. Marker size and colour follow the selected "
+                html.Div("Map of the 22 Welsh local authority districts (Esri light grey base map). Marker size and colour follow the selected "
                          "metric, or any column of a custom dataset. Click a district to pre-fill a question and add it to the dataset selection.",
                          style={"fontSize": "15px", "color": COLORS["muted"], "marginTop": "4px"}),
             ], style={"flex": "1 1 420px"}),
