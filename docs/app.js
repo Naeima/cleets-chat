@@ -64,7 +64,22 @@ function colour(scale, t) {
 }
 function initMap() {
   state.map = L.map("map", { scrollWheelZoom: true }).setView([52.42, -3.85], 8);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(state.map);
+  // Base maps. "Light" (default) is Esri's Light Gray Canvas, which draws no
+  // road network at country scale, so the LAD markers read cleanly. All four
+  // are free tile services that need no API key.
+  const osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  const esriAttr = "Tiles &copy; Esri";
+  const baseMaps = {
+    "Light": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16, attribution: esriAttr + " &mdash; Light Gray Canvas" }),
+    "Terrain": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}", { maxZoom: 13, attribution: esriAttr + " &mdash; World Terrain Base" }),
+    "OpenStreetMap": L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: osmAttr }),
+    "Satellite": L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 18, attribution: esriAttr + ", Maxar, Earthstar Geographics" }),
+  };
+  let chosen = "Light";
+  try { chosen = localStorage.getItem("cleets-basemap") || chosen; } catch (e) {}
+  (baseMaps[chosen] || baseMaps["Light"]).addTo(state.map);
+  L.control.layers(baseMaps, null, { position: "topright", collapsed: false }).addTo(state.map);
+  state.map.on("baselayerchange", (e) => { try { localStorage.setItem("cleets-basemap", e.name); } catch (err) {} });
   const sel = $("map-metric");
   for (const [key, m] of Object.entries(state.meta.map_metrics)) sel.add(new Option(m.label, key));
   sel.add(new Option("Custom dataset column (use 'Plot on map' in the dataset panel)", "custom"));
