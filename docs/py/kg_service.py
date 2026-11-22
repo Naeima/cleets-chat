@@ -22,6 +22,7 @@ Every value returned is read from the graphs; nothing is estimated here.
 from __future__ import annotations
 
 import logging
+import os
 import re
 from collections import defaultdict
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -56,13 +57,15 @@ logger = logging.getLogger("kg_service")
 CLEETS = Namespace("https://w3id.org/def/cleets#")
 DATA = Namespace("https://w3id.org/def/cleets/data#")
 ONTOLOGY_URL = "https://w3id.org/def/cleets"
+# Loaded into the observed graph when present (see tools/build_income_deprivation_la.py).
+OBSERVED_SUPPLEMENTS = ["cleets_income_deprivation_la.ttl"]
 
 # Observation classes in the observed graph and the predicate holding their value.
 VALUE_PREDICATES = {
     CLEETS.EVKeepership: (CLEETS.keepershipValue, "private BEV keepership"),
     CLEETS.EVChargerCount: (CLEETS.chargerCountValue, "public charging devices"),
     CLEETS.AdoptionRatioObservation: (CLEETS.keeperChargerRatio, "keepers per charger"),
-    CLEETS.IncomeDeprivation: (CLEETS.incomeDeprivationValue, "income deprivation (mean WIMD decile)"),
+    CLEETS.IncomeDeprivation: (CLEETS.incomeDeprivationValue, "income deprivation (mean WIMD decile of the district's LSOAs)"),
     CLEETS.Population: (CLEETS.populationValue, "resident population"),
     CLEETS.PopulationDensity: (CLEETS.densityValue, "population density (persons per sq km)"),
     # Generic cleets:Observation resources carry cleets:hasSimpleResult and are
@@ -81,6 +84,7 @@ MEASURE_KEYWORDS = [
     ("vehicle_stock", ("vehicle stock", "all vehicles", "total vehicles", "licensed vehicles")),
     ("population", ("population",)),
     ("density", ("density",)),
+    ("deprivation_decile", ("decile", "deciles")),
     ("deprivation", ("deprivation", "wimd", "income", "deprived")),
 ]
 
@@ -93,7 +97,8 @@ MEASURE_LABELS = {
     "vehicle_stock": "private vehicle stock",
     "population": "resident population",
     "density": "population density (persons per sq km)",
-    "deprivation": "income deprivation (mean WIMD decile)",
+    "deprivation": "people in income deprivation (%, WIMD 2025 local authority indicator)",
+    "deprivation_decile": "income deprivation (mean WIMD decile of the district's LSOAs)",
 }
 
 # Extra spellings stakeholders use for LADs (display name -> aliases).
@@ -173,6 +178,10 @@ class CLEETSKG:
         self.prediction_paths = self._as_paths(prediction_path)
         self.prediction_path = self.prediction_paths[0] if self.prediction_paths else ""
         self.observed_kg = self._load(observed_path, "observed")
+        # Observations published after the observation graph was released, kept in their own files.
+        for extra in OBSERVED_SUPPLEMENTS:
+            if os.path.exists(find_data_file(extra)):
+                self._load(extra, "observed supplement", into=self.observed_kg)
         self.prediction_kg = Graph()
         for p in self.prediction_paths:
             self._load(p, "prediction", into=self.prediction_kg)
@@ -529,7 +538,7 @@ class CLEETSKG:
         if cls == CLEETS.AdoptionRatioObservation:
             return "ratio"
         if cls == CLEETS.IncomeDeprivation:
-            return "deprivation"
+            return "deprivation_decile"
         if cls == CLEETS.Population:
             return "population"
         if cls == CLEETS.PopulationDensity:
@@ -541,6 +550,8 @@ class CLEETSKG:
             return "evs_per_1000"
         if prop.startswith("PrivateVehicleStock"):
             return "vehicle_stock"
+        if prop.startswith("PeopleInIncomeDeprivation"):
+            return "deprivation"
         return prop or "observation"
 
     def _build_observation_index(self):
@@ -905,7 +916,8 @@ class CLEETSKG:
         "vehicle_stock": ("Private vehicle stock (latest)", "obs", "vehicle_stock"),
         "population": ("Resident population (latest)", "obs", "population"),
         "density": ("Population density, persons per sq km (latest)", "obs", "density"),
-        "deprivation": ("Income deprivation, mean WIMD 2025 decile", "obs", "deprivation"),
+        "deprivation": ("People in income deprivation (%), WIMD 2025", "obs", "deprivation"),
+        "deprivation_decile": ("Income deprivation, mean WIMD 2025 decile of LSOAs", "obs", "deprivation_decile"),
         "pred_keepership_low": ("Predicted BEV keepership, low scenario", "pred", "low"),
         "pred_keepership_central": ("Predicted BEV keepership, central scenario", "pred", "central"),
         "pred_keepership_high": ("Predicted BEV keepership, high scenario", "pred", "high"),
@@ -1161,7 +1173,7 @@ class CLEETSKG:
 
         if lads and not measures:
             order = ["keepership", "chargers", "ratio", "chargers_per_100k", "evs_per_1000",
-                     "population", "density", "deprivation", "vehicle_stock"]
+                     "population", "density", "deprivation", "deprivation_decile", "vehicle_stock"]
             for lad in lads:
                 for m in order:
                     rows = [r for r in self._obs_by_lad.get(lad, []) if r["measure"] == m]

@@ -221,7 +221,7 @@ MAP_METRICS = {
     "obs_chargers": ("Observed public charging devices (latest quarter)", "obs", "chargers", "devices", "Greens"),
     "obs_ratio": ("Observed keepers per charger (latest quarter)", "obs", "ratio", "keepers/charger", "Oranges"),
     "obs_chargers_per_100k": ("Observed chargers per 100k residents (latest quarter)", "obs", "chargers_per_100k", "per 100k", "Teal"),
-    "obs_deprivation": ("Income deprivation, mean WIMD 2025 decile (1 = most deprived)", "obs", "deprivation", "decile", "RdYlGn"),
+    "obs_deprivation": ("People in income deprivation (%), WIMD 2025 local authority indicator", "obs", "deprivation", "%", "RdYlGn_r"),
     "custom": ("Custom dataset column (use 'Plot on map' in the dataset panel)", "custom", None, "", "Viridis"),
 }
 

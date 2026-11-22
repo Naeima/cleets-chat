@@ -1,0 +1,248 @@
+@prefix cleets: <https://w3id.org/def/cleets#> .
+@prefix cleetsdata: <https://w3id.org/def/cleets/data#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000001_2025 a cleets:Observation ;
+    rdfs:label "Isle of Anglesey people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000001 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 23.9 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000002_2025 a cleets:Observation ;
+    rdfs:label "Gwynedd people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000002 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 21.7 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000003_2025 a cleets:Observation ;
+    rdfs:label "Conwy people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000003 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 24.6 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000004_2025 a cleets:Observation ;
+    rdfs:label "Denbighshire people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000004 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 27.8 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000005_2025 a cleets:Observation ;
+    rdfs:label "Flintshire people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000005 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 20.8 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000006_2025 a cleets:Observation ;
+    rdfs:label "Wrexham people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000006 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 25.3 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000008_2025 a cleets:Observation ;
+    rdfs:label "Ceredigion people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000008 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 19.8 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000009_2025 a cleets:Observation ;
+    rdfs:label "Pembrokeshire people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000009 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 24.0 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000010_2025 a cleets:Observation ;
+    rdfs:label "Carmarthenshire people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000010 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 24.0 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000011_2025 a cleets:Observation ;
+    rdfs:label "Swansea people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000011 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 26.1 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000012_2025 a cleets:Observation ;
+    rdfs:label "Neath Port Talbot people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000012 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 28.7 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000013_2025 a cleets:Observation ;
+    rdfs:label "Bridgend people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000013 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 24.3 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000014_2025 a cleets:Observation ;
+    rdfs:label "Vale of Glamorgan people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000014 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 20.1 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000015_2025 a cleets:Observation ;
+    rdfs:label "Cardiff people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000015 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 25.8 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000016_2025 a cleets:Observation ;
+    rdfs:label "Rhondda Cynon Taf people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000016 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 26.9 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000018_2025 a cleets:Observation ;
+    rdfs:label "Caerphilly people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000018 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 28.2 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000019_2025 a cleets:Observation ;
+    rdfs:label "Blaenau Gwent people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000019 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 33.7 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000020_2025 a cleets:Observation ;
+    rdfs:label "Torfaen people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000020 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 28.8 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000021_2025 a cleets:Observation ;
+    rdfs:label "Monmouthshire people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000021 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 15.9 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000022_2025 a cleets:Observation ;
+    rdfs:label "Newport people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000022 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 28.1 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000023_2025 a cleets:Observation ;
+    rdfs:label "Powys people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000023 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 19.4 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivation_W06000024_2025 a cleets:Observation ;
+    rdfs:label "Merthyr Tydfil people in income deprivation (percentage), WIMD 2025"@en ;
+    dcterms:source <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    rdfs:comment "Published local authority estimate; the Wales value is 25.0%."@en ;
+    prov:wasDerivedFrom <https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> ;
+    cleets:forLAD cleetsdata:W06000024 ;
+    cleets:forTime cleetsdata:Year2025 ;
+    cleets:hasSimpleResult 30.5 ;
+    cleets:observesProperty cleetsdata:PeopleInIncomeDeprivationProperty .
+
+cleetsdata:PeopleInIncomeDeprivationProperty a cleets:ObservableProperty ;
+    rdfs:label "people in income deprivation, percentage of residents (WIMD 2025 indicator, local authority estimate)"@en .
+
+cleetsdata:Year2025 a cleets:Time ;
+    rdfs:label "2025" ;
+    cleets:year 2025 .
+
+<https://w3id.org/def/cleets/data#dataset/WIMD2025LocalAuthority> a dcat:Dataset,
+        prov:Entity ;
+    rdfs:label "WIMD2025LocalAuthority" ;
+    dcterms:bibliographicCitation "Welsh Government. Welsh Index of Multiple Deprivation (WIMD) 2025 indicator data for local authorities and Wales [Data set]. StatsWales. https://stats.gov.wales/en-GB/c28ab0ec-5893-46c2-a372-98d4058ba415"@en ;
+    dcterms:identifier "WIMD2025LocalAuthority" ;
+    dcterms:license <https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/> ;
+    dcterms:publisher "Welsh Government"@en ;
+    dcterms:spatial "Wales"@en ;
+    dcterms:title "Welsh Index of Multiple Deprivation (WIMD) 2025 indicator data for local authorities and Wales"@en ;
+    rdfs:comment "Source of the published percentage of people in income deprivation by local authority (Wales: 25.0%)."@en ;
+    dcat:landingPage <https://stats.gov.wales/en-GB/c28ab0ec-5893-46c2-a372-98d4058ba415> ;
+    dcat:version "2025" .
+
