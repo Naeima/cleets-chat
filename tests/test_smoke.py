@@ -48,7 +48,29 @@ def test_every_help_question_answers(kg, question_groups):
 
 def test_prediction_answers_cite_sources_and_type(kg):
     md = qa.answer_question(kg, "What is Cardiff's predicted EV keepership in 2045 under the central scenario?", mode="prediction")
-    assert "155,293" in md and "**Sources:**" in md and "Prediction type:" in md
+    assert "154,923" in md and "5,977" in md and "**Sources:**" in md and "Prediction type:" in md
+
+
+def test_quarter_and_stock_remaining_answers(kg):
+    """Every district and quarter of the turnover-constrained projection is retrievable, with the stock that remains."""
+    r = kg.prediction_quarter(2045, 4, "central", "Cardiff")
+    assert r["keepership"] == 154923 and r["non_bev_stock"] == 5977 and r["private_stock"] == 160900 and r["at_ceiling"] is True
+    w = kg.area_prediction_quarter(2045, 4, "central")
+    assert abs(w["keepership"] - 1776283) <= 5 and abs(w["non_bev_stock"] - 74717) <= 5 and round(w["adoption_share"], 4) == 0.9596
+    table = kg.prediction_table("central")
+    assert len(table) == 22 * 80 and all(r["non_bev_stock"] is not None for r in table)
+    assert all(abs(r["keepership"] + r["non_bev_stock"] - r["private_stock"]) <= 1 for r in table)
+    assert qa.extract_quarter("Cardiff in 2031 Q2") == qa.extract_quarter("Q2 2031") == qa.extract_quarter("second quarter of 2031") == (2031, 2)
+    md = qa.answer_question(kg, "What is Cardiff's predicted EV keepership in 2031 Q2?", mode="prediction")
+    assert "27,486" in md and "133,414" in md and "**Sources:**" in md
+    md = qa.answer_question(kg, "What is the stock remaining in Wales in 2040 Q4?", mode="prediction")
+    assert md.startswith("### Wales: 2040 Q4") and "non-BEV stock remaining" in md
+    full = qa.answer_question_rich(kg, "Give me a table of the quarterly predictions and stock remaining for all districts.", mode="prediction")
+    assert full["kind"] == "table" and len(full["table"]) == 23 * 80
+    one = qa.answer_question_rich(kg, "Give me a table of all districts in 2035 Q1 with the stock remaining.", mode="prediction")
+    assert one["kind"] == "table" and len(one["table"]) == 23
+    assert qa.detect_family("How much non-BEV stock remains in Powys in 2038 Q3?") == "diffusion"
+    assert qa.detect_family("How many non-BEV vehicles remain in Cardiff at 2053 under the turnover scenario?") == "turnover"
 
 
 def test_family_routing(kg):

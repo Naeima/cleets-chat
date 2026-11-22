@@ -141,7 +141,17 @@ QUESTION_GROUPS = {
         ],
     },
     "prediction": {
-        "Diffusion scenarios (paper S3.5, Figures 4-5)": [
+        "Quarterly predictions and stock remaining, all districts to 2045 (Supplementary Tables S12 to S15)": [
+            "What is Cardiff's predicted EV keepership in 2031 Q2?",
+            "How much non-BEV stock remains in Powys in 2038 Q3?",
+            "Show Gwynedd's quarterly predictions and remaining stock for 2034.",
+            "How does the remaining stock in Swansea decline?",
+            "What is the stock remaining in Wales in 2040 Q4?",
+            "Which district has the largest non-BEV stock remaining in 2040?",
+            "Give me a table of all districts in 2035 Q1 with the stock remaining.",
+            "Give me a table of the quarterly predictions and stock remaining for all districts.",
+        ],
+        "Scenarios and milestones": [
             f"What is Cardiff's predicted EV keepership in {FORECAST_YEAR} under the central scenario?",
             f"Compare Cardiff across all three scenarios in {FORECAST_YEAR}.",
             f"Which LAD has the highest predicted EV keepership in {FORECAST_YEAR}?",

@@ -16,31 +16,40 @@ Edit freely: this file is plain text and the app reloads it on restart.
 # Map from family key (prov:Activity local-name prefix) to explanation.
 METHODS = {
     "diffusion": {
-        "title": "Bounded logistic diffusion, scenario-constrained (paper S2.3.6, S3.4.3, S3.5; notebook Stage 6)",
+        "title": "Quarterly projection to 2045: logistic diffusion under the fleet-turnover ceiling (paper Sections 4.5 to 4.7 and 5.5 to 5.7; Supplementary Tables S12 to S15)",
         "body": """
-**What is predicted.** For each of the 22 Welsh LADs, the quarterly matched-scope
-private-fleet penetration: private battery-electric vehicles (VEH0132, keepership =
-Private, body type = All, cars and vans aggregated) divided by private licensed
-vehicles across all body types and fuels (VEH0105, keepership = Private). Counts are
-the predicted share multiplied by the LAD's latest VEH0105 private stock, which is
-held fixed as the ceiling.
+**What is predicted.** For each of the 22 Welsh LADs and every quarter from 2026 Q1
+to 2045 Q4: the matched-scope private-fleet penetration, that is private
+battery-electric vehicles (VEH0132, keepership = Private, body type = All, cars and
+vans aggregated) divided by private licensed vehicles across all body types and
+fuels (VEH0105, keepership = Private); the predicted keepership, which is that share
+multiplied by the LAD's private stock held at its 2025 Q4 level; and the non-BEV
+stock remaining, which is the same stock less the predicted keepership. A Wales
+total is stored for every quarter.
 
-**How.** A separate bounded logistic curve (rate, midpoint) is fitted to each LAD's
-quarterly observations, recency-weighted and shrunk toward the Wales anchor. The
-three scenarios do not come from the historical series: one shared midpoint shift
-per scenario moves every curve so that the capacity-weighted Wales-wide share at
-2045 Q4 equals the scenario target. {scenario_lines}
+**How.** A separate logistic curve (rate, midpoint) is fitted to each LAD's quarterly
+observations, recency-weighted. The curve alone would let the fleet change faster
+than vehicles are retired, so in every forecast quarter the reported share is the
+lower of the fitted curve and the LAD's own fleet-turnover ceiling. The ceiling
+carries the age structure of the stock forward with a Weibull survival curve
+(shape 4.5): sales of pure petrol and diesel vehicles end in 2030 Q1 and sales of
+hybrids in 2035 Q1, and the battery-electric share of new registrations rises to
+80% by 2030 and 100% by 2035. The three scenarios differ only in the median
+scrappage age behind the ceiling: 16 years (low), 14 years (central) and 12 years
+(high). {scenario_lines}
 
 **Example, in plain terms.** {example}
 
-**How to read it.** The terminal value is an explicit scenario assumption, not an
-official forecast and not a quantity inferred from the data. Rolling-origin
-backtests assess withheld historical quarters; they do not validate the 2045
-assumption. Every observation so far sits on the early limb of the S-curve, so the
+**How to read it.** Each row records whether the ceiling binds. Where it does, the
+district is limited by how quickly old vehicles leave the fleet, not by demand;
+where it does not, the fitted curve is the slower of the two. The stock remaining
+is mostly hybrids late in the horizon, because they stay on sale five years
+longer. Private stock is held constant, so a growing or shrinking fleet is not
+represented. Every observation so far sits on the early limb of the S-curve, so the
 per-LAD midpoints of this independent fit are weakly identified and should not be
 compared with each other; the hierarchical model (below) is the tool for that.
-Milestones stored in the KG give the first quarter at which each LAD's curve
-crosses 50%, 90% and 95% share under each scenario.
+Milestones stored in the KG give the first quarter at which each LAD reaches 50%,
+90% and 95% share under each scenario, where that falls before 2045 Q4.
 
 **Backtest (notebook Stage 13, quarterly revision).** The same bounded logistic is
 re-fitted off the released KG under a rolling-origin one-step-ahead protocol: every

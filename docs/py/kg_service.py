@@ -383,6 +383,15 @@ class CLEETSKG:
                 "keepership": _num(g.value(s, CLEETS.predictedKeepership)),
                 "adoption_share": _num(g.value(s, CLEETS.predictedAdoptionShare)),
             }
+            # Turnover-constrained diffusion rows also carry the stock that is not yet battery electric.
+            for key, prop in (("non_bev_stock", CLEETS.predictedNonBEVStock), ("ceiling_share", CLEETS.turnoverCeilingShare),
+                              ("private_stock", CLEETS.privateVehicleStock)):
+                v = _num(g.value(s, prop))
+                if v is not None:
+                    row[key] = v
+            flag = g.value(s, CLEETS.atTurnoverCeiling)
+            if flag is not None:
+                row["at_ceiling"] = str(flag).lower() == "true"
             if lad in self._lads:
                 self._pred[(lad, str(scen))].append(row)
             else:
@@ -736,6 +745,39 @@ class CLEETSKG:
             out.sort(key=lambda r: (r["keepership"] is None, -(r["keepership"] or 0)))
         return out
 
+    def prediction_quarter(self, year: int, quarter: int, scenario: str, lad_name, family: str = "diffusion") -> Optional[dict]:
+        """The single prediction row for one LAD, scenario and quarter (None if not covered)."""
+        return next((r for r in self.prediction_rows(year, scenario, lad_name, family) if r["quarter"] == int(quarter)), None)
+
+    def area_prediction_quarter(self, year: int, quarter: int, scenario: str, area: str = "Wales") -> Optional[dict]:
+        return next((r for r in self.area_prediction_rows(year, scenario, area) if r["quarter"] == int(quarter)), None)
+
+    def area_prediction_series(self, scenario: str, area: str = "Wales") -> List[dict]:
+        """Every quarterly row for an aggregate area (Wales), chronological."""
+        scenario = (scenario or "central").lower()
+        for (uri, scen), rows in self._area_pred.items():
+            name = self._area_names.get(uri, "")
+            if scen == scenario and area.casefold() in (name.casefold(), _local(uri).casefold()):
+                return [dict(r) for r in rows]
+        return []
+
+    def prediction_quarter_summary(self, year: int, quarter: int, scenario: str, family: str = "diffusion") -> List[dict]:
+        """One row per LAD for a single quarter, sorted by keepership (largest first)."""
+        scenario = (scenario or "central").lower()
+        out = [dict(r) for (uri, scen), rows in self._pred.items() if scen == scenario for r in rows
+               if r["year"] == int(year) and r["quarter"] == int(quarter) and (family is None or r["family"] == family)]
+        out.sort(key=lambda r: (r["keepership"] is None, -(r["keepership"] or 0)))
+        return out
+
+    def prediction_table(self, scenario: str = "central", lads=None, family: str = "diffusion") -> List[dict]:
+        """Every quarterly prediction for the scenario (all LADs, or those given), ordered by LAD then quarter."""
+        scenario = (scenario or "central").lower()
+        want = None if not lads else {str(self.resolve_lad(l)) for l in lads if self.resolve_lad(l) is not None}
+        out = [dict(r) for (uri, scen), rows in self._pred.items() if scen == scenario and (want is None or str(uri) in want)
+               for r in rows if family is None or r["family"] == family]
+        out.sort(key=lambda r: (r["lad_name"], r["year"], r["quarter"]))
+        return out
+
     def prediction_inventory(self) -> dict:
         lads = sorted({self._lads[k[0]] for k in self._pred})
         diffusion_count = sum(1 for rows in self._pred.values() for r in rows if r["family"] == "diffusion")
@@ -750,6 +792,8 @@ class CLEETSKG:
             "years": (self._pred_periods[0][0], self._pred_periods[-1][0]) if self._pred_periods else (None, None),
             "measures": ["predictedKeepership (private BEV keepership)",
                          "predictedAdoptionShare (BEV share of private vehicle stock)",
+                         "predictedNonBEVStock (private stock that is not yet battery electric)",
+                         "turnoverCeilingShare and atTurnoverCeiling (fleet-turnover ceiling and whether it binds)",
                          "thresholdShare milestones"],
             "triples": self._counts["prediction_triples"],
         }
@@ -776,6 +820,7 @@ class CLEETSKG:
             "ended": str(g.value(act, PROV.endedAtTime) or ""),
             "used": [self._dataset_link(d) for d in g.objects(act, PROV.used)],
             "scenarios": [{"scenario": _local(s), "terminal_target_share": _num(g.value(s, CLEETS.terminalTargetShare)),
+                           "median_scrappage_years": _num(g.value(s, CLEETS.medianScrappageYears)),
                            "midpoint_shift_quarters": _num(g.value(s, CLEETS.midpointShiftQuarters))}
                           for s in g.subjects(RDF.type, CLEETS.Scenario)],
         }
@@ -865,6 +910,7 @@ class CLEETSKG:
         "pred_keepership_central": ("Predicted BEV keepership, central scenario", "pred", "central"),
         "pred_keepership_high": ("Predicted BEV keepership, high scenario", "pred", "high"),
         "pred_share_central": ("Predicted BEV share, central scenario", "share", "central"),
+        "pred_nonbev_central": ("Predicted non-BEV stock remaining, central scenario", "nonbev", "central"),
         "hier_midpoint": ("Hierarchical diffusion midpoint (quarter)", "hier", "midpoint_period"),
         "hier_rate": ("Hierarchical diffusion rate per quarter", "hier", "rate_per_quarter"),
         "hier_lag": ("Lag against Welsh median midpoint (years)", "hier", "lag_vs_median_years"),
@@ -882,7 +928,7 @@ class CLEETSKG:
         for key, (label, kind, arg) in self.DATASET_COLUMNS.items():
             if kind == "obs" and not any(r["measure"] == arg for rows in self._obs_by_lad.values() for r in rows):
                 continue
-            if kind in ("pred", "share") and "diffusion" not in self._families and not self._pred:
+            if kind in ("pred", "share", "nonbev") and "diffusion" not in self._families and not self._pred:
                 continue
             if kind == "hier" and not self._hier:
                 continue
@@ -921,11 +967,11 @@ class CLEETSKG:
                         obs = [r for r in obs if r["year"] == year] or obs
                     row[label] = obs[-1]["value"] if obs else None
                     row[f"{label} period"] = obs[-1]["period"] if obs else ""
-                elif kind in ("pred", "share"):
+                elif kind in ("pred", "share", "nonbev"):
                     pr = self.prediction_rows(forecast_year, arg, uri)
                     pr = [r for r in pr if r["family"] == "diffusion"] or pr
                     if pr:
-                        row[f"{label} ({pr[-1]['period']})"] = pr[-1]["keepership"] if kind == "pred" else pr[-1]["adoption_share"]
+                        row[f"{label} ({pr[-1]['period']})"] = pr[-1].get({"pred": "keepership", "share": "adoption_share", "nonbev": "non_bev_stock"}[kind])
                     else:
                         row[f"{label} ({forecast_year})"] = None
                 elif kind == "hier":
@@ -948,7 +994,7 @@ class CLEETSKG:
                 sample = next((r for rows in self._obs_by_lad.values() for r in rows if r["measure"] == arg), None)
                 cand = self.source_links_for_subject(sample["subject"]) if sample else []
             else:
-                fam = {"pred": "diffusion", "share": "diffusion", "hier": "hierarchical", "turnover": "turnover",
+                fam = {"pred": "diffusion", "share": "diffusion", "nonbev": "diffusion", "hier": "hierarchical", "turnover": "turnover",
                        "charging": "charging", "covariates": "covariates"}.get(kind)
                 f = self._families.get(fam, {})
                 cand = [{"label": l["label"], "url": l["url"]} for l in (self._dataset_link(URIRef(u)) for u in f.get("used", []))]

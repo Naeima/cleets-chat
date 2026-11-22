@@ -50,6 +50,49 @@ def extract_year(q: str, default=2045):
     return years[-1] if years else default
 
 
+_ORDINALS = {"first": 1, "1st": 1, "second": 2, "2nd": 2, "third": 3, "3rd": 3, "fourth": 4, "4th": 4, "last": 4, "final": 4}
+
+
+def extract_quarter(q: str):
+    """(year, quarter) when the question names one quarter: '2031 Q2', '2031-Q2', 'Q2 2031', 'second quarter of 2031'."""
+    t = q.casefold()
+    m = re.search(r"\b(20\d{2})\s*[-/ ]?\s*q\s?([1-4])\b", t)
+    if m:
+        return int(m.group(1)), int(m.group(2))
+    m = re.search(r"\bq\s?([1-4])\s*(?:of|in|,)?\s*[-/]?\s*(20\d{2})\b", t)
+    if m:
+        return int(m.group(2)), int(m.group(1))
+    m = re.search(r"\b(first|1st|second|2nd|third|3rd|fourth|4th|last|final)\s+quarter\s+(?:of|in)\s+(20\d{2})\b", t)
+    if m:
+        return int(m.group(2)), _ORDINALS[m.group(1)]
+    m = re.search(r"\bquarter\s+([1-4])\s*(?:of|in|,)?\s*(20\d{2})\b", t)
+    if m:
+        return int(m.group(2)), int(m.group(1))
+    return None
+
+
+STOCK_WORDS = ("stock remaining", "remaining stock", "stock that remains", "stock left", "remaining fleet", "fleet remaining",
+               "vehicles remain", "cars remain", "still remain", "remaining vehicles", "remaining cars", "remaining non",
+               "non-bev", "non bev", "non-electric", "non electric", "not electric", "not yet electric",
+               "decreasing stock", "declining stock", "stock decline", "left on the road", "still on the road",
+               "how many remain", "remaining")
+QUARTERLY_WORDS = ("quarterly", "per quarter", "each quarter", "every quarter", "by quarter", "all quarters", "quarter by quarter",
+                   "quarter-by-quarter", "time series", "trajectory", "year by year", "each year", "every year", "per year", "over time")
+# Words that point at the separate age-structured turnover family rather than the quarterly projection.
+TURNOVER_ONLY = ("2053", "turnover", "scrappage", "age-structured", "structural age", "vintage", "arrival", "99%", "99 per",
+                 "phase-out", "phase out", "sales ban", "residual")
+
+
+def wants_stock(question: str) -> bool:
+    q = question.casefold()
+    return any(w in q for w in STOCK_WORDS)
+
+
+def wants_quarterly(question: str) -> bool:
+    q = question.casefold()
+    return any(w in q for w in QUARTERLY_WORDS)
+
+
 def extract_scenario(q: str, default="central"):
     # Whole-word match only: "highest"/"lowest" are rankings, not scenarios.
     m = re.search(r"\b(low|central|high)\b", q.casefold())
@@ -242,8 +285,12 @@ def _example_diffusion(kg) -> str:
                  + f" gives {steps}.")
     lo = kg.prediction_rows(2045, "low", lad, family="diffusion"); hi = kg.prediction_rows(2045, "high", lad, family="diffusion")
     if lo and hi:
-        parts.append(f"The low and high scenarios slide the same curve later or earlier, giving **{_fmt(lo[-1]['keepership'])}** and "
-                     f"**{_fmt(hi[-1]['keepership'])}** vehicles at {lo[-1]['period']}.")
+        parts.append(f"The low and high scenarios cap the same curve with a ceiling for longer-lived (16-year) or shorter-lived (12-year) "
+                     f"vehicles, giving **{_fmt(lo[-1]['keepership'])}** and **{_fmt(hi[-1]['keepership'])}** vehicles at {lo[-1]['period']}.")
+    last = rows[2045][-1]
+    if last.get("non_bev_stock") is not None:
+        parts.append(f"What is left is the stock remaining: **{_fmt(last['non_bev_stock'])}** vehicles in {lad} are still not battery "
+                     f"electric at {last['period']} under the central scenario.")
     if stock and stock["value"]:
         parts.append(f"Every count is the predicted share multiplied by the {_fmt(stock['value'])} vehicles {lad} had at {stock['period']}, "
                      "so a growing or shrinking future fleet is not part of the picture.")
@@ -429,9 +476,11 @@ def methods_text(kg, family: str) -> str:
         for s in sorted(act.get("scenarios", []), key=lambda x: x.get("terminal_target_share") or 0):
             tts = s.get("terminal_target_share"); sh = s.get("midpoint_shift_quarters")
             if tts is not None:
-                lines.append(f"**{s['scenario']}**: {tts:.1%} of the private stock at 2045 Q4"
-                             + (f" (midpoint shift {sh:+.2f} quarters)" if sh is not None else ""))
-        fill["scenario_lines"] = ("Scenario constraints in the KG: " + "; ".join(lines) + ".") if lines else ""
+                age = s.get("median_scrappage_years")
+                lines.append(f"**{s['scenario']}**: Wales ceiling {tts:.2%} of the private stock at 2045 Q4"
+                             + (f" ({age:.0f}-year median scrappage age)" if age is not None else "")
+                             + (f" (midpoint shift {sh:+.2f} quarters)" if sh else ""))
+        fill["scenario_lines"] = ("Scenario ceilings in the KG: " + "; ".join(lines) + ".") if lines else ""
 
     if family in ("hierarchical", "covariates"):
         eff = kg.covariate_effects() if hasattr(kg, "covariate_effects") else []
@@ -513,6 +562,10 @@ FAMILY_KEYWORDS = [
 
 def detect_family(question: str, default: str = "diffusion") -> str:
     q = " " + question.casefold() + " "
+    # Quarter-level questions and questions on the stock that remains are answered from the quarterly projection,
+    # unless the wording points at the age-structured turnover run.
+    if (extract_quarter(question) or wants_stock(question) or wants_quarterly(question)) and not any(w in q for w in TURNOVER_ONLY):
+        return "diffusion"
     for key, words in FAMILY_KEYWORDS:
         if any(w in q for w in words):
             return key
@@ -599,6 +652,104 @@ def table_answer(kg, question: str, mode: str = "actual") -> dict:
     return {"markdown": md, "table": rows, "columns": cols, "kind": "table", "family": None, "sources": links}
 
 
+# --------------------------------------------------------------------------- quarterly projection
+def _proj_row(r: dict) -> dict:
+    """One prediction row in the column layout of the quarterly projection table."""
+    return {"LAD": r["lad_name"], "LAD code": r["lad_uri"].rsplit("#", 1)[-1], "Quarter": r["period"], "Scenario": r["scenario"],
+            "Predicted BEV keepership": r.get("keepership"),
+            "Non-BEV stock remaining": r.get("non_bev_stock"),
+            "BEV share (%)": None if r.get("adoption_share") is None else round(100 * r["adoption_share"], 2),
+            "Turnover ceiling (%)": None if r.get("ceiling_share") is None else round(100 * r["ceiling_share"], 2),
+            "At ceiling": "" if r.get("at_ceiling") is None else ("yes" if r["at_ceiling"] else "no"),
+            "Private stock": r.get("private_stock")}
+
+
+PROJ_COLUMNS = ["LAD", "Quarter", "Predicted BEV keepership", "Non-BEV stock remaining", "BEV share (%)", "Turnover ceiling (%)", "At ceiling"]
+PROJECTION_NOTE = ("Each district follows the lower of its fitted diffusion curve and its fleet-turnover ceiling. The stock remaining is the "
+                   "district's private stock, held at its 2025 Q4 level, less the predicted battery-electric keepership. Pure petrol and "
+                   "diesel sales end in 2030 Q1 and hybrid sales in 2035 Q1.")
+
+
+def wants_projection_table(kg, question: str, mode: str) -> bool:
+    """A request for the quarterly projection itself (rather than a one-row-per-LAD custom dataset)."""
+    if mode != "prediction":
+        return False
+    q = " " + question.casefold() + " "
+    if any(w in q for w in TURNOVER_ONLY) or any(w in q for w in ("table 6", "table 7", "table 8", "table 9", "table 10")):
+        return False
+    everyone = any(w in q for w in ("all districts", "all lads", "every district", "every lad", "each district", "each lad",
+                                    "22 districts", "22 lads", "all 22", "all the predictions", "all predictions",
+                                    "all local authorit", "full projection", "whole projection"))
+    quarter_context = wants_quarterly(question) or extract_quarter(question) is not None or "quarter" in q
+    if wants_table(question):
+        return quarter_context or wants_stock(question)
+    return everyone and quarter_context
+
+
+def projection_table_answer(kg, question: str) -> dict:
+    """Quarterly projection as a table: all districts and quarters, one district, one quarter or one year."""
+    scenario = extract_scenario(question)
+    lads = [name for name, _ in kg.find_lads_in_text(question)]
+    yq = extract_quarter(question)
+    years = [int(y) for y in re.findall(r"\b(20\d{2})\b", question)]
+    rows = kg.prediction_table(scenario, lads=lads or None)
+    wales = [] if lads else kg.area_prediction_series(scenario)
+    if yq:
+        keep = lambda r: (r["year"], r["quarter"]) == yq
+        when = f"{yq[0]} Q{yq[1]}"
+    elif len(years) >= 2:
+        lo, hi = min(years), max(years)
+        keep = lambda r: lo <= r["year"] <= hi
+        when = f"{lo} to {hi}"
+    elif years:
+        keep = lambda r: r["year"] == years[0]
+        when = f"{years[0]}"
+    else:
+        keep = lambda r: True
+        when = (f"{rows[0]['period']} to {rows[-1]['period']}" if rows else "")
+    rows = [r for r in rows if keep(r)]
+    if yq:
+        rows.sort(key=lambda r: -(r.get("keepership") or 0))
+    table = [_proj_row(r) for r in rows] + [_proj_row(r) for r in wales if keep(r)]
+    links = family_sources(kg, "diffusion")
+    if not table:
+        inv = kg.prediction_inventory()
+        md = (f"### Not found in the prediction knowledge graph\n\nThe quarterly projection covers {inv['periods'][0]} to {inv['periods'][-1]} "
+              f"for {len(inv['lads'])} districts; nothing matches {when or 'that request'}.\n\n**Knowledge graph:** [CLEETS]({ONTOLOGY})")
+        return {"markdown": md, "kind": "prediction", "family": "diffusion", "table": None, "columns": None}
+    n_lads = len({r["LAD"] for r in table if r["LAD code"] != "W92000004"})
+    n_q = len({r["Quarter"] for r in table})
+    scope = (", ".join(lads) if lads else f"all {n_lads} districts and Wales")
+    preview = table if len(table) <= 30 else table[:24]
+    md = (f"### Quarterly projection, {scenario} scenario: {scope}, {when}\n\n"
+          f"{len(table):,} rows ({n_lads} district{'s' if n_lads != 1 else ''}"
+          + ("" if lads else " plus the Wales total") + f", {n_q} quarter{'s' if n_q != 1 else ''}). {PROJECTION_NOTE}\n\n"
+          + md_table(preview, PROJ_COLUMNS)
+          + (f"\n\n*Showing the first {len(preview)} of {len(table):,} rows.*" if len(preview) < len(table) else "")
+          + f"\n\n**Sources:** {md_links(links)}"
+          + "\n\n*Use the download button to save the full table as CSV. These are model predictions, not observed values.*"
+          + _method_footer(kg, "diffusion"))
+    return {"markdown": md, "table": table, "columns": None, "kind": "table", "family": "diffusion", "sources": links}
+
+
+def _cap(text: str) -> str:
+    return text[:1].upper() + text[1:]
+
+
+def _quarter_sentence(r: dict) -> str:
+    out = f"predicted private BEV keepership **{r['keepership']:,.0f}**"
+    if r.get("adoption_share") is not None:
+        out += f" (**{r['adoption_share']:.2%}** of the private stock)"
+    if r.get("non_bev_stock") is not None:
+        out += f"; non-BEV stock remaining **{r['non_bev_stock']:,.0f}**"
+        if r.get("private_stock"):
+            out += f" of {r['private_stock']:,.0f} private vehicles"
+    if r.get("at_ceiling") is not None and r.get("ceiling_share") is not None:
+        out += (f". The trajectory is held at the fleet-turnover ceiling ({r['ceiling_share']:.2%})" if r["at_ceiling"]
+                else f". The fitted curve is below the fleet-turnover ceiling ({r['ceiling_share']:.2%}), so the ceiling does not bind")
+    return out + "."
+
+
 # --------------------------------------------------------------------------- inventory
 def inventory_answer(kg, mode):
     if mode == "prediction":
@@ -634,6 +785,73 @@ def diffusion_answer(kg, question, humanize: bool = False):
     lads = kg.find_lads_in_text(question)
     fam = "diffusion"
     src = family_sources(kg, fam)
+    yq = extract_quarter(question)
+    stock_q = wants_stock(question)
+
+    # One named quarter: a district (or several), otherwise Wales.
+    if yq:
+        y, qn = yq
+        names = [n for n, _ in lads]
+        got = [(n, kg.prediction_quarter(y, qn, scenario, n)) for n in names]
+        got = [(n, r) for n, r in got if r]
+        wales = kg.area_prediction_quarter(y, qn, scenario)
+        if names and not got or (not names and not wales):
+            inv = kg.prediction_inventory()
+            return (f"### Not found in the prediction knowledge graph\n\nThe quarterly projection covers {inv['periods'][0]} to "
+                    f"{inv['periods'][-1]}; {y} Q{qn} is outside it.\n\n**Knowledge graph:** [CLEETS]({ONTOLOGY})")
+        if got:
+            title = f"### {', '.join(n for n, _ in got)}: {y} Q{qn}, {scenario} scenario"
+            body = "\n".join(f"- **{n}**: {_quarter_sentence(r)}" for n, r in got) if len(got) > 1 else _cap(_quarter_sentence(got[0][1]))
+            links = kg.source_links_for_subject(got[0][1]["subject"], prediction=True) or src
+        else:
+            title = f"### Wales: {y} Q{qn}, {scenario} scenario"
+            body = _cap(_quarter_sentence(wales))
+            links = src
+            rows = kg.prediction_quarter_summary(y, qn, scenario)
+            if rows and rows[0].get("non_bev_stock") is not None:
+                most = max(rows, key=lambda r: r["non_bev_stock"]); least = min(rows, key=lambda r: r["non_bev_stock"])
+                body += (f" Across the {len(rows)} districts the stock remaining ranges from **{least['non_bev_stock']:,.0f}** "
+                         f"({least['lad_name']}) to **{most['non_bev_stock']:,.0f}** ({most['lad_name']}); "
+                         f"{sum(1 for r in rows if r.get('at_ceiling'))} districts are at their ceiling. "
+                         f"Ask for a table of all districts in {y} Q{qn} to see every value.")
+        return (f"{title}\n\n{body}\n\n**Sources:** {md_links(links)}\n\n*This is a model prediction, not an observed value.*"
+                + _method_footer(kg, fam))
+
+    # Rankings by the stock that remains.
+    if stock_q and not lads and any(x in q for x in ("highest", "most", "largest", "top", "rank", "lowest", "least", "smallest", "fewest", "bottom")):
+        rows = [r for r in kg.prediction_year_summary(year, scenario, family=fam) if r.get("non_bev_stock") is not None]
+        if rows:
+            low = any(x in q for x in ("lowest", "least", "smallest", "fewest", "bottom"))
+            share = "share" in q or "proportion" in q or "percent" in q or "%" in q
+            key = (lambda r: 1 - r["adoption_share"]) if share else (lambda r: r["non_bev_stock"])
+            rows.sort(key=key, reverse=not low)
+            body = "\n".join(f"{i+1}. **{r['lad_name']}**: {r['non_bev_stock']:,.0f} non-BEV vehicles "
+                             f"({1 - r['adoption_share']:.2%} of its private stock)" for i, r in enumerate(rows[:10]))
+            return (f"### {'Smallest' if low else 'Largest'} non-BEV stock remaining{' by share' if share else ''}: "
+                    f"{rows[0]['period']}, {scenario} scenario\n\n{body}\n\n{PROJECTION_NOTE}\n\n**Sources:** {md_links(src)}"
+                    + _method_footer(kg, fam))
+
+    # A district's path, quarter by quarter (a stated year) or year end by year end (whole horizon).
+    if lads and (wants_quarterly(question) or (stock_q and not re.search(r"\b20\d{2}\b", question))):
+        name = lads[0][0]
+        stated = [int(v) for v in re.findall(r"\b(20\d{2})\b", question)]
+        series = kg.prediction_series(scenario, name)
+        series = [r for r in series if r["family"] == fam]
+        if stated:
+            lo, hi = min(stated), max(stated)
+            shown = [r for r in series if lo <= r["year"] <= hi]
+            span = f"{lo}" if lo == hi else f"{lo} to {hi}"
+            if len(shown) > 24:
+                shown = [r for r in shown if r["quarter"] == 4]; span += ", fourth quarter of each year"
+        else:
+            shown = [r for r in series if r["quarter"] == 4]
+            span = "fourth quarter of each year"
+        if shown:
+            table = [_proj_row(r) for r in shown]
+            return (f"### {name}: predicted keepership and stock remaining, {scenario} scenario ({span})\n\n"
+                    + md_table(table, PROJ_COLUMNS[1:]) + f"\n\n{PROJECTION_NOTE} "
+                    f"Ask for a table of {name}'s quarterly predictions to download all {len(series)} quarters.\n\n"
+                    f"**Sources:** {md_links(src)}" + _method_footer(kg, fam))
 
     if "all three" in q or (lads and "scenario" in q and "compare" in q) or (lads and "sensitiv" in q):
         name = lads[0][0] if lads else "Cardiff"
@@ -649,8 +867,8 @@ def diffusion_answer(kg, question, humanize: bool = False):
             if lo and hi:
                 spread = hi[-1]["keepership"] - lo[-1]["keepership"]
                 lines.append(f"\nSpread between the low and high scenarios at {rows_c[-1]['period']}: **{spread:,.0f}** vehicles "
-                             f"({spread / rows_c[-1]['keepership']:.1%} of the central value). The scenarios differ only in the shared "
-                             f"midpoint shift that sets the Wales-wide terminal share, so the spread measures the terminal-constraint sensitivity.")
+                             f"({spread / rows_c[-1]['keepership']:.1%} of the central value). The scenarios differ only in the median "
+                             f"scrappage age behind the fleet-turnover ceiling (16, 14 and 12 years), so the spread measures sensitivity to vehicle lifetime.")
         return "\n".join(lines) + f"\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam)
 
     if any(x in q for x in ("highest", "top", "rank")):
@@ -683,13 +901,17 @@ def diffusion_answer(kg, question, humanize: bool = False):
             links = kg.source_links_for_subject(r["subject"], prediction=True) or src
             share = f"; predicted adoption share **{r['adoption_share']:.2%}**" if r["adoption_share"] is not None else ""
             body = (f"Under the **{scenario}** scenario, the latest {year} quarterly prediction ({r['period']}) gives predicted private BEV keepership of **{r['keepership']:,.0f}**{share}.")
+            if r.get("non_bev_stock") is not None:
+                body += (f" The non-BEV stock remaining is **{r['non_bev_stock']:,.0f}** vehicles"
+                         + (f" of {r['private_stock']:,.0f}" if r.get("private_stock") else "")
+                         + (", with the trajectory held at the fleet-turnover ceiling." if r.get("at_ceiling") else "."))
             if len(lads) > 1:
                 other = kg.prediction_rows(year, scenario, lads[1][0], family=fam)
                 if other:
                     o = other[-1]
                     body += (f" For **{lads[1][0]}** the same quarter gives **{o['keepership']:,.0f}** ({o['adoption_share']:.2%}). "
-                             f"Both LADs follow the same scenario constraint; the counts differ because each share is multiplied by the LAD's own "
-                             f"private vehicle stock and each curve has its own fitted rate and midpoint.")
+                             f"The counts differ because each share is multiplied by the LAD's own private vehicle stock, and each LAD has its "
+                             f"own fitted curve and its own fleet-turnover ceiling.")
             if humanize:
                 body = humanize_answer(body, metadata={"subject": name, "value": f"{r['keepership']:,.0f}", "period": r['period'], "scenario": scenario})
             return (f"### {name} prediction\n\n{body}\n\n**Sources:** {md_links(links)}\n\n"
@@ -717,6 +939,8 @@ def diffusion_answer(kg, question, humanize: bool = False):
         if wales:
             w = wales[-1]
             body += f" The Wales-wide total at {w['period']} is **{w['keepership']:,.0f}** private BEVs ({w['adoption_share']:.1%} of the private stock)."
+            if w.get("non_bev_stock") is not None:
+                body += f" The non-BEV stock remaining in Wales is **{w['non_bev_stock']:,.0f}** vehicles."
         if humanize:
             body = humanize_answer(body, metadata={"count": len(rows), "mean_keepership": f"{avg:,.0f}", "year": year, "scenario": scenario})
         return (f"### Wales prediction summary — {year}, {scenario} scenario\n\n{body}\n\n**Sources:** {md_links(src)}"
@@ -1105,6 +1329,9 @@ def answer_question_rich(kg, question: str, mode: str = "actual", humanize: bool
     out_of_scope = check_scope(kg, question, mode=mode, family=family)
     if out_of_scope is not None:
         return out_of_scope
+
+    if family in (None, "diffusion") and wants_projection_table(kg, question, mode):
+        return projection_table_answer(kg, question)
 
     if wants_table(q) and not any(w in q for w in ("table 6", "table 7", "table 8", "table 9", "table 10")):
         return table_answer(kg, question, mode)
