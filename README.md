@@ -138,6 +138,7 @@ Eight open datasets, all under the Open Government Licence v3 (citations rendere
 - The CLEETS ontology (OWL 2 DL, published at https://w3id.org/def/cleets) defines districts, observations, measures, time entities and provenance terms; the release graph declares `dcterms:conformsTo` it and bundles the SHACL shapes used for validation.
 - `notebooks/Final_Modelling_CLEETS_all_body_types_private_keepership.ipynb`, Stages 1–3 and 12, builds the ontology, populates CLEETS-KG from the source tables, adds the commonsense (CSKG) alignment layer and writes the release graph `cleets_kg_v130.ttl` (87,824 triples).
 - `tools/kg_citations/enrich_citations.py` adds the citation layer (`dcterms:source` from every observation to its `dcat:Dataset` record, rendered `dcterms:bibliographicCitation`, licence, publisher and landing page per dataset, `prov:wasGeneratedBy` activities for derived indicators) from a source manifest `cleets_sources.json`, and `tools/kg_citations/validate.py` re-checks the result with SHACL and a SPARQL coverage audit. Output: `data/cleets_cskg_enriched.ttl` (CLEETS-KG-Enriched v1.3.0, 96,479 triples: 22 Welsh LADs with 6,314 observations over nine measures, 296 English LADs with population density, 8 dataset records).
+- `tools/extract_panel.py` extracts the quarterly district panel used by every prediction type from the enriched graph by SPARQL (one query per measure, joined on district code, year and quarter). Output: `data/cleets_lad_quarter_panel.csv`, one row per Welsh LAD and quarter, 2009-Q4 to 2026-Q2 (1,474 rows): private battery-electric keepership (VEH0132), public charging devices (EVCI9001), private vehicle stock (VEH0105), adoption share, EVs per 1,000 residents, chargers per 100k residents, keepers per charger, population, density and WIMD 2025 income decile. Load it directly with `pd.read_csv("https://raw.githubusercontent.com/Naeima/cleets-chat/main/data/cleets_lad_quarter_panel.csv")`, or regenerate it with `python tools/extract_panel.py`.
 
 ### 3. Models and the Prediction KG
 
@@ -182,10 +183,11 @@ about.py                       "About CLEETS-CHAT" text; datasets and figures fi
 build_prediction_families.py   notebook outputs / CSV exports -> data/cleets_prediction_families.ttl
 build_site.py                  -> docs/ (GitHub Pages build)
 analyze_feedback.py, evaluate_answers.py
-data/                          cleets_cskg_enriched.ttl, cleets_prediction_kg.ttl, cleets_prediction_families.ttl
+data/                          cleets_cskg_enriched.ttl, cleets_prediction_kg.ttl, cleets_prediction_families.ttl, cleets_lad_quarter_panel.csv
 docs/                          GitHub Pages site (index.html, app.js, style.css, data/, py/) and guides/
 notebooks/                     companion modelling notebook (quarterly revision + original) and two supplementary pipelines
 tools/kg_citations/            citation-layer enrichment and validation for the knowledge graph
+tools/extract_panel.py         SPARQL extraction of the quarterly LAD panel -> data/cleets_lad_quarter_panel.csv
 tests/                         pytest smoke tests and snapshot round-trip
 assets/                        cleets_logo.png (header logo)
 ```
@@ -227,7 +229,7 @@ Whenever the graphs or the Python modules change: `python build_site.py`, run th
 ## Data, licences and citation
 
 - Code: MIT License (see `LICENSE`).
-- Knowledge graphs (`data/*.ttl`): CC BY 4.0, as declared in their dataset records. Cite the release graph as:
+- Knowledge graphs (`data/*.ttl`) and the extracted district panel (`data/cleets_lad_quarter_panel.csv`): CC BY 4.0, as declared in their dataset records. Cite the release graph as:
 
   > Hamed, N., Yao, F., Potoglou, D., Haggar, P., Sharma, A., Wadhwa, A. & Rana, O. (2026) CLEETS-KG v1.3.0: knowledge graph of electric-vehicle adoption and charging provision across Welsh local authority districts [Data set]. Zenodo. (DOI to be minted on deposit.)
 
