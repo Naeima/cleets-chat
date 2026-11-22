@@ -9,7 +9,7 @@ Question answering over the CLEETS knowledge graphs of electric-vehicle adoption
 <!-- about:start -->
 ## About CLEETS-CHAT
 
-CLEETS-CHAT is a question-answering assistant for electric-vehicle (EV) adoption in Wales. It answers free-text questions from two knowledge graphs rather than from a language model's memory: the observed graph CLEETS-KG-Enriched (6,314 observations of 9 measures for the 22 Welsh local authority districts, 2009 to 2026) and the CLEETS Prediction KG (5,280 quarterly scenario forecasts to 2045 and the 6 prediction types of the companion paper). Every answer is assembled from retrieved statements or from calculations the system performs on them, names the dataset behind each value, states whether a value is observed, calculated or predicted, and explains how each prediction was generated. Stakeholders can extract custom district tables, plot them on the map, download them as CSV and score every answer.
+CLEETS-CHAT is a question-answering assistant for electric-vehicle (EV) adoption in Wales. It answers free-text questions from two knowledge graphs rather than from a language model's memory: the observed graph CLEETS-KG-Enriched (6,336 observations of 10 measures for the 22 Welsh local authority districts, 2009 to 2026) and the CLEETS Prediction KG (5,280 quarterly scenario forecasts to 2045 and the 6 prediction types of the companion paper). Every answer is assembled from retrieved statements or from calculations the system performs on them, names the dataset behind each value, states whether a value is observed, calculated or predicted, and explains how each prediction was generated. Stakeholders can extract custom district tables, plot them on the map, download them as CSV and score every answer.
 
 ### Built on an ontology-based knowledge graph
 
@@ -17,7 +17,7 @@ Both graphs conform to the CLEETS ontology (OWL 2 DL, published at https://w3id.
 
 ### Datasets in the current graphs
 
-The observed graph currently integrates 6 open datasets under the Open Government Licence, all at local-authority level, listed below with the measures each one supplies (read from the dataset records in the graph).
+The observed graph currently integrates 7 open datasets under the Open Government Licence, all at local-authority level, listed below with the measures each one supplies (read from the dataset records in the graph).
 
 | Dataset | Publisher | Licence | Role | Measures supplied | Coverage |
 |---|---|---|---|---|---|
@@ -26,7 +26,8 @@ The observed graph currently integrates 6 open datasets under the Open Governmen
 | [EVCI9001](https://www.gov.uk/government/collections/electric-vehicle-charging-infrastructure-statistics) | Department for Transport / Office for Zero Emission Vehicles | OGL v3.0 | Source dataset | chargers per 100k residents, keepers per charger, public charging devices | 2019-Q4 to 2026-Q2 |
 | [VEH0105](https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-tables) | Department for Transport / Driver and Vehicle Licensing Agency | OGL v3.0 | Source dataset | private vehicle stock | 2009-Q4 to 2025-Q4 |
 | [ONSDensity](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates) | Office for National Statistics | OGL v3.0 | Source dataset | population density (persons per sq km) | 2011 to 2024 |
-| [WIMD2025](https://www.gov.wales/welsh-index-multiple-deprivation) | Welsh Government | OGL v3.0 | Source dataset | income deprivation (mean WIMD decile) | 2025 |
+| [WIMD2025](https://www.gov.wales/welsh-index-multiple-deprivation) | Welsh Government | OGL v3.0 | Source dataset | income deprivation (mean WIMD decile of the district's LSOAs) | 2025 |
+| [WIMD2025LocalAuthority](https://stats.gov.wales/en-GB/c28ab0ec-5893-46c2-a372-98d4058ba415) | Welsh Government | OGL v3.0 | Source dataset | people in income deprivation (%, WIMD 2025 local authority indicator) | 2025 |
 | [ONSGeoLookup](https://geoportal.statistics.gov.uk/) | Office for National Statistics | OGL v3.0 | Reference (geography) |  |  |
 | [ONSOpenGeography](https://geoportal.statistics.gov.uk/) | Office for National Statistics | OGL v3.0 | Reference (geography) |  |  |
 | [CLEETS-KG v1.3.0](https://w3id.org/def/cleets) | Cardiff University | CC BY 4.0 | Knowledge graph release |  |  |
@@ -131,6 +132,7 @@ Eight open datasets, all under the Open Government Licence v3 (citations rendere
 | StatsWalesPopulation | Population estimates by local authority and year (mid-year estimates) | Welsh Government |
 | ONSDensity | Population density (persons per square kilometre), England and Wales | ONS |
 | WIMD2025 | Welsh Index of Multiple Deprivation, income domain deciles by LSOA | Welsh Government |
+| WIMD2025LocalAuthority | WIMD 2025 indicator data for local authorities and Wales: people in income deprivation (percentage), as published. Held in `data/cleets_income_deprivation_la.ttl` (written by `tools/build_income_deprivation_la.py`) and loaded with the observation graph; it is what "income deprivation" returns. The mean LSOA decile of the released graph is returned for "decile". | Welsh Government |
 | ONSGeoLookup, ONSOpenGeography | LSOA to local authority lookup; statistical geography codes and names | ONS |
 
 ### 2. Ontology and observed knowledge graph

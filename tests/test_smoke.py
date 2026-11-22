@@ -88,7 +88,13 @@ def test_dataset_table_and_sources(kg):
     assert len(rows) == 22 and rows[0]["LAD"] == "Blaenau Gwent"
     cardiff = next(r for r in rows if r["LAD"] == "Cardiff")
     assert cardiff["Private BEV keepership (latest)"] == 3214 and cardiff["Turnover: first quarter at 99% BEV share"] == "2048-Q3"
-    assert {s["label"] for s in kg.dataset_sources(cols)} >= {"VEH0132", "EVCI9001", "WIMD2025"}
+    assert {s["label"] for s in kg.dataset_sources(cols)} >= {"VEH0132", "EVCI9001", "WIMD2025LocalAuthority"}
+    # Income deprivation is the published local authority percentage; the mean LSOA decile stays available by name.
+    assert cardiff["People in income deprivation (%), WIMD 2025"] == 25.8 and rows[0]["People in income deprivation (%), WIMD 2025"] == 33.7
+    both = kg.dataset_table(["deprivation", "deprivation_decile"])
+    merthyr = next(r for r in both if r["LAD"] == "Merthyr Tydfil")
+    assert merthyr["People in income deprivation (%), WIMD 2025"] == 30.5 and merthyr["Income deprivation, mean WIMD 2025 decile of LSOAs"] == 4.36
+    assert {s["label"] for s in kg.dataset_sources(["deprivation_decile"])} >= {"WIMD2025"}
     r = qa.answer_question_rich(kg, "Give me a table of keepership, chargers, deprivation, population and density for Cardiff and Swansea", mode="actual")
     assert r["kind"] == "table" and len(r["table"]) == 2
 

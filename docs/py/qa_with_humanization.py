@@ -591,6 +591,7 @@ COLUMN_KEYWORDS = [
     ("vehicle_stock", ("vehicle stock", "licensed vehicles", "private stock")),
     ("population", ("population",)),
     ("density", ("density",)),
+    ("deprivation_decile", ("decile",)),
     ("deprivation", ("deprivation", "wimd", "income")),
     ("hier_midpoint", ("midpoint", "hierarchical")),
     ("hier_rate", ("diffusion rate", "rate per quarter")),
