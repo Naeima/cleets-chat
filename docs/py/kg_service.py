@@ -56,13 +56,16 @@ logger = logging.getLogger("kg_service")
 
 CLEETS = Namespace("https://w3id.org/def/cleets#")
 DATA = Namespace("https://w3id.org/def/cleets/data#")
+QB = Namespace("http://purl.org/linked-data/cube#")
+SDMX_DIM = Namespace("http://purl.org/linked-data/sdmx/2009/dimension#")
 ONTOLOGY_URL = "https://w3id.org/def/cleets"
-# Loaded into the observed graph when present (see tools/build_income_deprivation_la.py).
-OBSERVED_SUPPLEMENTS = ["cleets_income_deprivation_la.ttl"]
+# Loaded into the observed graph when present: observations added since the v1.3.0 graph release
+# (tools/build_income_deprivation_la.py, tools/build_observed_supplements.py).
+OBSERVED_SUPPLEMENTS = ["cleets_income_deprivation_la.ttl", "cleets_private_cars.ttl", "cleets_car_cohorts.ttl"]
 
 # Observation classes in the observed graph and the predicate holding their value.
 VALUE_PREDICATES = {
-    CLEETS.EVKeepership: (CLEETS.keepershipValue, "private BEV keepership"),
+    CLEETS.EVKeepership: (CLEETS.keepershipValue, "private BEV keepership (all body types)"),
     CLEETS.EVChargerCount: (CLEETS.chargerCountValue, "public charging devices"),
     CLEETS.AdoptionRatioObservation: (CLEETS.keeperChargerRatio, "keepers per charger"),
     CLEETS.IncomeDeprivation: (CLEETS.incomeDeprivationValue, "income deprivation (mean WIMD decile of the district's LSOAs)"),
@@ -75,6 +78,9 @@ VALUE_PREDICATES = {
 
 # Keyword -> measure key used by actual_search().
 MEASURE_KEYWORDS = [
+    ("bev_cars", ("battery-electric car", "battery electric car", "electric car", "bev car", "private bev car", "cars that are electric")),
+    ("car_stock", ("private car", "car stock", "licensed car", "all cars", "cars of all fuels", "number of cars")),
+    ("hybrid_stock", ("hybrid",)),
     ("keepership", ("keepership", "keeper", "bev", "battery electric", "electric vehicle", "ev uptake",
                     "ev adoption", "adoption", "uptake", "ulev")),
     ("chargers", ("charger", "charging", "chargepoint", "charge point", "charging device")),
@@ -89,12 +95,15 @@ MEASURE_KEYWORDS = [
 ]
 
 MEASURE_LABELS = {
-    "keepership": "private BEV keepership",
+    "bev_cars": "private battery-electric cars",
+    "car_stock": "private cars (all fuels)",
+    "hybrid_stock": "private petrol hybrid vehicles (all body types)",
+    "keepership": "private BEV keepership (all body types)",
     "chargers": "public charging devices",
     "ratio": "keepers per charger",
     "chargers_per_100k": "chargers per 100k residents",
     "evs_per_1000": "EVs per 1,000 residents",
-    "vehicle_stock": "private vehicle stock",
+    "vehicle_stock": "private vehicle stock (all body types)",
     "population": "resident population",
     "density": "population density (persons per sq km)",
     "deprivation": "people in income deprivation (%, WIMD 2025 local authority indicator)",
@@ -324,11 +333,11 @@ class CLEETSKG:
     # Family keys are the first token of the activity's local name
     # (activity/diffusion-q2026rev -> "diffusion", activity/turnover-2026-09-15 -> "turnover").
     FAMILY_LABELS = {
-        "diffusion": "Bounded logistic diffusion scenarios",
+        "diffusion": "Bounded logistic diffusion capped by the turnover path",
         "hierarchical": "Hierarchical diffusion (two-stage empirical Bayes)",
-        "turnover": "Age-structured fleet turnover, 2032 phase-out",
+        "turnover": "Fleet turnover path (observed scrappage and second-hand entry)",
         "charging": "Charging-provision constraint (2045)",
-        "neural": "Scenario-constrained neural and graph neural forecasts",
+        "neural": "Turnover-constrained neural and graph neural predictions",
         "covariates": "Cross-sectional covariate comparison",
     }
 
@@ -357,8 +366,8 @@ class CLEETSKG:
                 fam["used"].append(str(d))
         if "diffusion" in self._families:
             f = self._families["diffusion"]
-            f.setdefault("paper", ""); f["paper"] = f["paper"] or "S2.3.6, S3.4.3, S3.5"
-            f["stage"] = f["stage"] or "Stage 6 (companion notebook)"
+            f.setdefault("paper", ""); f["paper"] = f["paper"] or "Sections 4.2 and 4.6 (methods); 5.4 to 5.8 (results)"
+            f["stage"] = f["stage"] or "Sections 6 and 13 of the companion notebook"
 
     def _family_of(self, s) -> str:
         act = self.prediction_kg.value(s, PROV.wasGeneratedBy)
@@ -392,15 +401,16 @@ class CLEETSKG:
                 "keepership": _num(g.value(s, CLEETS.predictedKeepership)),
                 "adoption_share": _num(g.value(s, CLEETS.predictedAdoptionShare)),
             }
-            # Turnover-constrained diffusion rows also carry the stock that is not yet battery electric.
-            for key, prop in (("non_bev_stock", CLEETS.predictedNonBEVStock), ("ceiling_share", CLEETS.turnoverCeilingShare),
-                              ("private_stock", CLEETS.privateVehicleStock)):
+            # Rows of the capped diffusion predictions also carry the petrol and diesel cars that remain, the fitted
+            # curve, the district's turnover path and whether the reported value is the path (the lower of the two).
+            for key, prop in (("non_bev_stock", CLEETS.predictedNonBEVStock), ("fitted_share", CLEETS.fittedCurveShare),
+                              ("path_share", CLEETS.turnoverPathShare), ("private_stock", CLEETS.privateCarStock)):
                 v = _num(g.value(s, prop))
                 if v is not None:
                     row[key] = v
-            flag = g.value(s, CLEETS.atTurnoverCeiling)
+            flag = g.value(s, CLEETS.onTurnoverPath)
             if flag is not None:
-                row["at_ceiling"] = str(flag).lower() == "true"
+                row["on_path"] = str(flag).lower() == "true"
             if lad in self._lads:
                 self._pred[(lad, str(scen))].append(row)
             else:
@@ -474,6 +484,15 @@ class CLEETSKG:
                       "bev_share_2045": _num(g.value(s, CLEETS.bevShare2045)),
                       "bev_share_end": _num(g.value(s, CLEETS.bevShareEnd)),
                       "residual_non_bev": _num(g.value(s, CLEETS.residualNonBEV))})
+            # District inputs and results of the turnover path (present when the family was built from the path).
+            for key, prop in (("private_cars", CLEETS.privateCarStock), ("bev_cars_start", CLEETS.bevCarsAtStart),
+                              ("bev_share_start", CLEETS.bevShareAtStart), ("mean_age_years", CLEETS.meanAgeYears),
+                              ("share_aged_15_plus", CLEETS.shareAged15Plus), ("first_year_entry_share", CLEETS.firstYearEntryShare),
+                              ("relative_bev_uptake", CLEETS.relativeBEVUptake), ("bev_share_2030", CLEETS.bevShare2030),
+                              ("bev_share_2035", CLEETS.bevShare2035), ("bev_share_2040", CLEETS.bevShare2040)):
+                v = _num(g.value(s, prop))
+                if v is not None:
+                    r[key] = v
             for m in self._milestones:
                 if m["lad_uri"] == r["lad_uri"] and m["family"] == r["family"]:
                     r[f"reaches_{m['threshold_share']:g}"] = m["period"]
@@ -481,12 +500,14 @@ class CLEETSKG:
         self._turnover.sort(key=lambda r: r["arrival_rank"] or 0)
         for s in g.subjects(RDF.type, CLEETS.TurnoverCeiling):
             self._ceilings.append({"subject": str(s), "family": self._family_of(s),
+                                   "model": str(g.value(s, CLEETS.turnoverModel) or ""),
+                                   "scrappage_period": str(g.value(s, CLEETS.scrappageRatesPeriod) or ""),
                                    "median_scrappage_years": _num(g.value(s, CLEETS.medianScrappageYears)),
                                    "implied_annual_replacement_pct": _num(g.value(s, CLEETS.impliedAnnualReplacementPct)),
                                    "bev_share_2045": _num(g.value(s, CLEETS.bevShare2045)),
                                    "shortfall_pp": _num(g.value(s, CLEETS.shortfallFrom100pp)),
                                    "residual_non_bev": _num(g.value(s, CLEETS.residualNonBEV))})
-        self._ceilings.sort(key=lambda r: r["median_scrappage_years"] or 0)
+        self._ceilings.sort(key=lambda r: (r["model"] != "turnover path", r["median_scrappage_years"] or 0))
         for s in g.subjects(RDF.type, CLEETS.ChargingConstraintAssessment):
             lad, r = lad_row(s)
             r.update({"bev_share_2045": _num(g.value(s, CLEETS.bevShare2045)),
@@ -512,6 +533,7 @@ class CLEETSKG:
                                   "mae": _num(g.value(s, CLEETS.mae)), "rmse": _num(g.value(s, CLEETS.rmse)),
                                   "r2": _num(g.value(s, CLEETS.r2)), "pooled_r2": _num(g.value(s, CLEETS.pooledR2)),
                                   "n": _num(g.value(s, CLEETS.nPredictions)),
+                                  "horizon": _num(g.value(s, CLEETS.horizonQuarters)),
                                   "note": str(g.value(s, CLEETS.metricNote) or "")})
         self._metrics.sort(key=lambda r: (r["family"], r["target"], r["mae"] or 0))
         for key, rows, kind in (("hierarchical", self._hier, "parameters"), ("turnover", self._turnover, "arrival"),
@@ -550,6 +572,12 @@ class CLEETSKG:
             return "evs_per_1000"
         if prop.startswith("PrivateVehicleStock"):
             return "vehicle_stock"
+        if prop.startswith("PrivateBatteryElectricCars"):
+            return "bev_cars"
+        if prop.startswith("PrivateCarStock"):
+            return "car_stock"
+        if prop.startswith("PrivateHybridStock"):
+            return "hybrid_stock"
         if prop.startswith("PeopleInIncomeDeprivation"):
             return "deprivation"
         return prop or "observation"
@@ -616,6 +644,37 @@ class CLEETSKG:
                     self._dataset_meta[str(d)] = {"publisher": str(g.value(d, DCTERMS.publisher) or ""),
                                                   "license": str(g.value(d, DCTERMS.license) or ""),
                                                   "citation": str(g.value(d, DCTERMS.bibliographicCitation) or "")}
+        self._build_cube_index()
+
+    # Wording of the measure a cohort table supplies (the cube shares one dimension property for the year of
+    # first registration and the year of first use, so the table's own term is given here).
+    CUBE_MEASURES = {"VEH9901": "licensed cars by year of first registration, fuel group and keepership",
+                     "VEH1111": "licensed cars at each year end by year of first use"}
+
+    def _build_cube_index(self):
+        """RDF Data Cube observations in the observed graph (the cohort tables VEH9901 and VEH1111), counted
+        per qb:DataSet: {dataset uri: {n, first, last, areas}}. They feed the dataset catalogue and the
+        citation audit; the turnover model's district results are read from the prediction graph."""
+        self._cube_usage: Dict[str, dict] = {}
+        g = self.observed_kg
+        for s in g.subjects(RDF.type, QB.Observation):
+            d = g.value(s, QB.dataSet)
+            if d is None:
+                continue
+            u = self._cube_usage.setdefault(str(d), {"n": 0, "first": None, "last": None, "first_key": None, "last_key": None, "areas": {}})
+            u["n"] += 1
+            t = g.value(s, SDMX_DIM.refPeriod)
+            y, q, label = self._period(t) if t is not None else (None, None, "")
+            if y:
+                key = (y, q or 0)
+                if u["first_key"] is None or key < u["first_key"]:
+                    u["first_key"], u["first"] = key, label
+                if u["last_key"] is None or key > u["last_key"]:
+                    u["last_key"], u["last"] = key, label
+            area = g.value(s, SDMX_DIM.refArea)
+            name = ("Welsh local authority districts" if area in self._lads else
+                    str(g.value(area, SKOS.prefLabel) or g.value(area, RDFS.label) or _local(area)) if area is not None else "")
+            u["areas"][name] = u["areas"].get(name, 0) + 1
 
     # --------------------------------------------------------------------- LADs
     def lad_map(self) -> Dict[str, Tuple[str, str]]:
@@ -801,10 +860,10 @@ class CLEETSKG:
             "scenarios": self._scenarios,
             "periods": [p[2] for p in self._pred_periods],
             "years": (self._pred_periods[0][0], self._pred_periods[-1][0]) if self._pred_periods else (None, None),
-            "measures": ["predictedKeepership (private BEV keepership)",
-                         "predictedAdoptionShare (BEV share of private vehicle stock)",
-                         "predictedNonBEVStock (private stock that is not yet battery electric)",
-                         "turnoverCeilingShare and atTurnoverCeiling (fleet-turnover ceiling and whether it binds)",
+            "measures": ["predictedKeepership (private battery-electric cars)",
+                         "predictedAdoptionShare (battery-electric share of private cars)",
+                         "predictedNonBEVStock (petrol and diesel cars remaining, hybrids included)",
+                         "fittedCurveShare, turnoverPathShare and onTurnoverPath (the fitted curve, the turnover path and which of the two is reported)",
                          "thresholdShare milestones"],
             "triples": self._counts["prediction_triples"],
         }
@@ -831,8 +890,9 @@ class CLEETSKG:
             "ended": str(g.value(act, PROV.endedAtTime) or ""),
             "used": [self._dataset_link(d) for d in g.objects(act, PROV.used)],
             "scenarios": [{"scenario": _local(s), "terminal_target_share": _num(g.value(s, CLEETS.terminalTargetShare)),
-                           "median_scrappage_years": _num(g.value(s, CLEETS.medianScrappageYears)),
-                           "midpoint_shift_quarters": _num(g.value(s, CLEETS.midpointShiftQuarters))}
+                           "sales_share_2030": _num(g.value(s, CLEETS.salesShareAt2030)),
+                           "scrappage_period": str(g.value(s, CLEETS.scrappageRatesPeriod) or ""),
+                           "comment": str(g.value(s, RDFS.comment) or "")}
                           for s in g.subjects(RDF.type, CLEETS.Scenario)],
         }
 
@@ -876,8 +936,10 @@ class CLEETSKG:
     def model_metrics(self, family: str = None) -> List[dict]:
         return [dict(r) for r in self._metrics if family is None or r["family"] == family]
 
-    # Targets of the comparable backtests (Table 7 and the Stage 13 logistic run), by keyword.
-    METRIC_TARGETS = {"chargers": "EV chargers", "keepership": "EV keepership"}
+    # Target of the comparable backtests (the paper's model comparison), by keyword.
+    METRIC_TARGETS = {"cars": "Private battery-electric cars", "keepership": "Private battery-electric cars"}
+    COMPARISON_MARKER = "Model comparison"       # metricNote of the rows scored under the one-step protocol
+    HORIZON_MARKER = "Multi-horizon"             # metricNote of the rows rolled forward 1 to 16 quarters
 
     def _metric_rows(self, marker: str, target: str = None) -> Dict[str, List[dict]]:
         wanted = self.METRIC_TARGETS.get((target or "").casefold(), target)
@@ -891,14 +953,18 @@ class CLEETSKG:
 
     def model_ranking(self, target: str = None) -> Dict[str, List[dict]]:
         """{target label: metric rows ranked by MAE} for the approaches compared under one protocol
-        (Table 7: best configuration of each approach, identical rolling-origin folds). Falls back to
-        the Stage 13 bounded-logistic run when Table 7 is not loaded. `target` may be 'chargers',
-        'keepership' or a target label; None gives every target."""
-        return self._metric_rows("Table 7", target) or self._metric_rows("Stage 13", target)
+        (the paper's model comparison: identical rolling-origin folds, one quarter ahead). `target` may be
+        'cars', 'keepership' or a target label; None gives every target."""
+        return self._metric_rows(self.COMPARISON_MARKER, target)
+
+    def horizon_metrics(self) -> List[dict]:
+        """MAE of each model rolled forward 1, 4, 8, 12 and 16 quarters from the same origins
+        (rows of the multi-horizon backtest), ordered by model and horizon."""
+        rows = [dict(m) for m in self._metrics if self.HORIZON_MARKER in m.get("note", "") and m.get("horizon")]
+        return sorted(rows, key=lambda r: (r["model"], r["horizon"]))
 
     def logistic_backtest(self, target: str = None) -> Dict[str, List[dict]]:
-        """{target label: Stage 13 rows} — the bounded logistic re-run off the released KG under the
-        low/central/high capacity multipliers (K = alpha x last training observation)."""
+        """Rows of an older bounded-logistic run under capacity multipliers, when a graph still holds them."""
         return self._metric_rows("Stage 13", target)
 
     def best_models(self, target: str = None) -> Dict[str, dict]:
@@ -908,27 +974,32 @@ class CLEETSKG:
     # ----------------------------------------------------------- dataset extraction
     # Column catalogue for dataset_table(): key -> (label, kind, argument)
     DATASET_COLUMNS = {
-        "keepership": ("Private BEV keepership (latest)", "obs", "keepership"),
+        "bev_cars": ("Private battery-electric cars (latest)", "obs", "bev_cars"),
+        "car_stock": ("Private cars, all fuels (latest)", "obs", "car_stock"),
+        "keepership": ("Private BEV keepership, all body types (latest)", "obs", "keepership"),
         "chargers": ("Public charging devices (latest)", "obs", "chargers"),
         "ratio": ("Keepers per charger (latest)", "obs", "ratio"),
         "chargers_per_100k": ("Chargers per 100k residents (latest)", "obs", "chargers_per_100k"),
         "evs_per_1000": ("EVs per 1,000 residents (latest)", "obs", "evs_per_1000"),
-        "vehicle_stock": ("Private vehicle stock (latest)", "obs", "vehicle_stock"),
+        "vehicle_stock": ("Private vehicle stock, all body types (latest)", "obs", "vehicle_stock"),
+        "hybrid_stock": ("Private petrol hybrid vehicles, all body types (latest)", "obs", "hybrid_stock"),
         "population": ("Resident population (latest)", "obs", "population"),
         "density": ("Population density, persons per sq km (latest)", "obs", "density"),
         "deprivation": ("People in income deprivation (%), WIMD 2025", "obs", "deprivation"),
         "deprivation_decile": ("Income deprivation, mean WIMD 2025 decile of LSOAs", "obs", "deprivation_decile"),
-        "pred_keepership_low": ("Predicted BEV keepership, low scenario", "pred", "low"),
-        "pred_keepership_central": ("Predicted BEV keepership, central scenario", "pred", "central"),
-        "pred_keepership_high": ("Predicted BEV keepership, high scenario", "pred", "high"),
-        "pred_share_central": ("Predicted BEV share, central scenario", "share", "central"),
-        "pred_nonbev_central": ("Predicted non-BEV stock remaining, central scenario", "nonbev", "central"),
+        "pred_keepership_low": ("Predicted private battery-electric cars, low scenario", "pred", "low"),
+        "pred_keepership_central": ("Predicted private battery-electric cars, central scenario", "pred", "central"),
+        "pred_keepership_high": ("Predicted private battery-electric cars, high scenario", "pred", "high"),
+        "pred_share_central": ("Predicted battery-electric share of private cars, central scenario", "share", "central"),
+        "pred_nonbev_central": ("Predicted petrol and diesel cars remaining, central scenario", "nonbev", "central"),
         "hier_midpoint": ("Hierarchical diffusion midpoint (quarter)", "hier", "midpoint_period"),
         "hier_rate": ("Hierarchical diffusion rate per quarter", "hier", "rate_per_quarter"),
         "hier_lag": ("Lag against Welsh median midpoint (years)", "hier", "lag_vs_median_years"),
-        "turnover_share_2045": ("Turnover ceiling: BEV share at 2045 Q4", "turnover", "bev_share_2045"),
-        "turnover_residual": ("Turnover: residual non-BEV vehicles at 2053 Q4", "turnover", "residual_non_bev"),
-        "turnover_reaches_99": ("Turnover: first quarter at 99% BEV share", "turnover", "reaches_0.99"),
+        "turnover_share_2045": ("Turnover path: battery-electric share of private cars at 2045 Q4", "turnover", "bev_share_2045"),
+        "turnover_residual": ("Turnover path: petrol and diesel cars at 2045 Q4", "turnover", "residual_non_bev"),
+        "turnover_reaches_50": ("Turnover path: first quarter at 50% battery-electric share", "turnover", "reaches_0.5"),
+        "car_age": ("Mean age of private cars at 2026 Q2 (years)", "turnover", "mean_age_years"),
+        "first_year_entry": ("First-year cars among cars entering private keepership (share)", "turnover", "first_year_entry_share"),
         "charging_class": ("Charging-constraint class (2045)", "charging", "constraint_class"),
         "charging_evs_per_device": ("BEVs per public charging device at 2045", "charging", "evs_per_charge_point_2045"),
         "covariate_residual": ("Ridge covariate residual, EVs per 1,000", "covariates", "residual"),
@@ -1010,9 +1081,9 @@ class CLEETSKG:
                        "charging": "charging", "covariates": "covariates"}.get(kind)
                 f = self._families.get(fam, {})
                 cand = [{"label": l["label"], "url": l["url"]} for l in (self._dataset_link(URIRef(u)) for u in f.get("used", []))]
-            for l in cand:
-                if l["url"] not in seen:
-                    seen.add(l["url"]); links.append(l)
+            for l in cand:      # several DfT tables share one landing page, so a table is identified by label and page
+                if (l["label"], l["url"]) not in seen:
+                    seen.add((l["label"], l["url"])); links.append(l)
         return links
 
     # ----------------------------------------------------------------- observed
@@ -1026,6 +1097,7 @@ class CLEETSKG:
             "datasets": datasets,
             "lads": self.lad_names(),
             "measures": sorted({r["measure_label"] for rows in self._obs_by_lad.values() for r in rows}),
+            "cube_observations": sum(c["n"] for c in getattr(self, "_cube_usage", {}).values()),
         }
 
     def dataset_catalogue(self) -> List[dict]:
@@ -1053,6 +1125,19 @@ class CLEETSKG:
                             u["first_key"], u["first"] = key, r["period"]
                         if u["last_key"] is None or key > u["last_key"]:
                             u["last_key"], u["last"] = key, r["period"]
+        for d_uri, c in getattr(self, "_cube_usage", {}).items():      # cohort tables held as data cube observations
+            if URIRef(d_uri) not in self._datasets:
+                continue
+            ident = self._datasets[URIRef(d_uri)][0]
+            areas = sorted(c["areas"], key=lambda a: (a != "Welsh local authority districts", a))
+            label = self.CUBE_MEASURES.get(ident, "licensed cars (data cube observations)") + (f" ({', '.join(a for a in areas if a)})" if areas else "")
+            u = usage.setdefault(d_uri, {"measures": {}, "n": 0, "first": None, "last": None, "first_key": None, "last_key": None})
+            u["measures"][label] = c["n"]
+            u["n"] += c["n"]
+            if c["first_key"] and (u["first_key"] is None or c["first_key"] < u["first_key"]):
+                u["first_key"], u["first"] = c["first_key"], c["first"]
+            if c["last_key"] and (u["last_key"] is None or c["last_key"] > u["last_key"]):
+                u["last_key"], u["last"] = c["last_key"], c["last"]
         out = []
         for d, (ident, _, url, title) in self._datasets.items():
             meta = self._dataset_meta.get(str(d), {})
@@ -1124,8 +1209,14 @@ class CLEETSKG:
         for key, words in MEASURE_KEYWORDS:
             if any(w in q for w in words) and key not in found:
                 found.append(key)
-        # "EV"/"EVs" alone means keepership unless chargers were named.
-        if re.search(r"\bevs?\b", q) and "keepership" not in found and "chargers" not in found:
+        # "battery electric cars" names the car series (VEH0142); the keepership series (VEH0132, all body types)
+        # is added only when the question also says keepership or keeper.
+        if "bev_cars" in found and "keepership" in found and not any(w in q for w in ("keepership", "keeper", "all body types")):
+            found.remove("keepership")
+        if "car_stock" in found and "bev_cars" in found and not any(w in q for w in ("all cars", "all fuels", "car stock", "share")):
+            found.remove("car_stock")
+        # "EV"/"EVs" alone means keepership unless chargers or cars were named.
+        if re.search(r"\bevs?\b", q) and not any(k in found for k in ("keepership", "chargers", "bev_cars")):
             found.insert(0, "keepership")
         return found
 
@@ -1172,8 +1263,8 @@ class CLEETSKG:
             return stmts[:limit]
 
         if lads and not measures:
-            order = ["keepership", "chargers", "ratio", "chargers_per_100k", "evs_per_1000",
-                     "population", "density", "deprivation", "deprivation_decile", "vehicle_stock"]
+            order = ["bev_cars", "car_stock", "keepership", "chargers", "ratio", "chargers_per_100k", "evs_per_1000",
+                     "population", "density", "deprivation", "deprivation_decile", "vehicle_stock", "hybrid_stock"]
             for lad in lads:
                 for m in order:
                     rows = [r for r in self._obs_by_lad.get(lad, []) if r["measure"] == m]
@@ -1315,6 +1406,11 @@ class CLEETSKG:
                 uncited = [str(s) for s in subjects if not self._reaches_dataset(g, s)]
                 resources.append({"graph": graph_name, "class": cls, "total": len(subjects),
                                   "uncited": len(uncited), "examples": uncited[:3]})
+        cube_obs = list(self.observed_kg.subjects(RDF.type, QB.Observation)) if self.observed_kg is not None else []
+        if cube_obs:      # cohort tables: each cube observation cites its table with dcterms:source
+            uncited = [str(s) for s in cube_obs if not self._reaches_dataset(self.observed_kg, s)]
+            resources.append({"graph": "observed", "class": "qb:Observation", "total": len(cube_obs),
+                              "uncited": len(uncited), "examples": uncited[:3]})
         activities = []
         if self.prediction_kg is not None:
             g = self.prediction_kg
@@ -1392,6 +1488,7 @@ class CLEETSKG:
             "subject_sources": subject_sources,
             "citation_audit": self.citation_audit(),
             "dataset_catalogue": self.dataset_catalogue(),
+            "cube_usage": getattr(self, "_cube_usage", {}),
         }
 
     @classmethod
@@ -1436,6 +1533,7 @@ class CLEETSKG:
         self._subject_sources = data.get("subject_sources", {})
         self._citation_audit = data.get("citation_audit", {})
         self._dataset_catalogue = data.get("dataset_catalogue", [])
+        self._cube_usage = data.get("cube_usage", {})
         return self
 
 
@@ -1446,10 +1544,10 @@ if __name__ == "__main__":
     rows = kg.prediction_rows(2045, "central", "Cardiff")
     if rows:
         r = rows[-1]
-        print(f"\nCardiff {r['period']} central: keepership {r['keepership']:,.0f}, share {r['adoption_share']:.2%}")
+        print(f"\nCardiff {r['period']} central: {r['keepership']:,.0f} private battery-electric cars, share {r['adoption_share']:.2%}")
     top = kg.prediction_year_summary(2045, "central")[:3]
     print("Top 3 (2045, central):", [(r["lad_name"], int(r["keepership"])) for r in top])
-    latest = kg.latest_observation("Cardiff", "keepership")
+    latest = kg.latest_observation("Cardiff", "bev_cars")
     if latest:
-        print("Latest observed Cardiff keepership:", latest["period"], latest["value"])
+        print("Latest observed private battery-electric cars in Cardiff:", latest["period"], latest["value"])
         print("Sources:", kg.source_links_for_subject(latest["subject"]))

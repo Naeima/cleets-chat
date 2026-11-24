@@ -113,6 +113,8 @@ QUESTION_GROUPS = {
         "Observed data": [
             "What data are available in CLEETS-KG?",
             "What do you know about Cardiff?",
+            "How many private battery-electric cars does Cardiff have?",
+            "How many private cars are licensed in Powys?",
             "Show Cardiff EV keepership data.",
             "How has Cardiff EV keepership changed over time?",
             "Which LAD has the highest EV keepership?",
@@ -120,7 +122,7 @@ QUESTION_GROUPS = {
             "Compare Cardiff and Swansea.",
         ],
         "Custom datasets (download or map)": [
-            "Give me a table of keepership, charging count, deprivation, population and population density for the 22 LADs.",
+            "Give me a table of battery-electric cars, keepership, charging count, deprivation, population and population density for the 22 LADs.",
             "Extract chargers per 100k residents and income deprivation for all LADs as CSV.",
             "Table of population and EV keepership for Cardiff, Swansea and Newport in 2024.",
         ],
@@ -141,54 +143,54 @@ QUESTION_GROUPS = {
         ],
     },
     "prediction": {
-        "Quarterly predictions and stock remaining, all districts to 2045 (Supplementary Tables S12 to S15)": [
-            "What is Cardiff's predicted EV keepership in 2031 Q2?",
-            "How much non-BEV stock remains in Powys in 2038 Q3?",
-            "Show Gwynedd's quarterly predictions and remaining stock for 2034.",
-            "How does the remaining stock in Swansea decline?",
-            "What is the stock remaining in Wales in 2040 Q4?",
-            "Which district has the largest non-BEV stock remaining in 2040?",
-            "Give me a table of all districts in 2035 Q1 with the stock remaining.",
-            "Give me a table of the quarterly predictions and stock remaining for all districts.",
+        "Quarterly predictions and cars remaining, all districts to 2045 (Supplementary Tables S9 to S12)": [
+            "How many private battery-electric cars are predicted for Cardiff in 2031 Q2?",
+            "How many petrol and diesel cars remain in Powys in 2038 Q3?",
+            "Show Gwynedd's quarterly predictions and remaining cars for 2034.",
+            "How do the remaining petrol and diesel cars in Swansea decline?",
+            "How many petrol and diesel cars remain in Wales in 2040 Q4?",
+            "Which district has the most petrol and diesel cars remaining in 2040?",
+            "Give me a table of all districts in 2035 Q1 with the cars remaining.",
+            "Give me a table of the quarterly predictions and cars remaining for all districts.",
         ],
         "Scenarios and milestones": [
-            f"What is Cardiff's predicted EV keepership in {FORECAST_YEAR} under the central scenario?",
+            f"How many private battery-electric cars are predicted for Cardiff in {FORECAST_YEAR} under the central scenario?",
             f"Compare Cardiff across all three scenarios in {FORECAST_YEAR}.",
-            f"Which LAD has the highest predicted EV keepership in {FORECAST_YEAR}?",
+            f"Which LAD has the highest predicted number of battery-electric cars in {FORECAST_YEAR}?",
             f"Summarise Wales in {FORECAST_YEAR} under the high scenario.",
-            "When does Cardiff reach 50% and 90% BEV share under the central scenario?",
+            "When does Cardiff reach a 50% BEV share under the central scenario?",
             "How sensitive is Cardiff to the scenario assumption?",
         ],
-        "Hierarchical diffusion (Table 9)": [
+        "Hierarchical diffusion (paper Section 5.4)": [
             "Which LADs diffuse most slowly?",
             "Which LADs diffuse fastest?",
             "What are Gwynedd's hierarchical diffusion midpoint and rate?",
             "What makes an LAD diffuse late?",
         ],
-        "Age-structured turnover, 2032 phase-out (Table 10, Figure 7)": [
-            "When does each LAD reach 99% BEV share under the 2032 phase-out?",
-            "What is the Wales fleet-turnover ceiling at 2045 under different scrappage ages?",
-            "How many non-BEV vehicles remain in Cardiff at 2053 under the turnover scenario?",
-            "Which LADs have the largest residual non-BEV stock?",
+        "Fleet turnover path: scrappage and second-hand entry (paper Sections 4.6 and 5.6)": [
+            "What is the turnover path for Ceredigion?",
+            "How old are the private cars in Blaenau Gwent?",
+            "What is the Wales turnover path at 2045 under different scrappage rates?",
+            "Which districts have the oldest cars?",
+            "Which LADs have the largest residual of petrol and diesel cars?",
         ],
-        "Charging constraint (research question 2)": [
+        "Model accuracy: neural, graph neural, drift and logistic backtests (paper Section 5.5)": [
+            "Which model is most accurate?",
+            "How well does the turnover-constrained neural network perform?",
+            "Does the graph neural network beat the bounded logistic?",
+        ],
+        "Charging constraint (September 2026 analysis, not in the paper)": [
             "Where may charging provision be the principal constraint?",
             "Is charging provision plausibly binding in Powys?",
         ],
-        "Model accuracy: neural, graph neural, drift and logistic backtests (Tables 5-7)": [
-            "Which model is most accurate for EV chargers?",
-            "Which model is most accurate for EV keepership?",
-            "How well does the scenario-constrained neural network perform?",
-            "Does the graph neural network beat the bounded logistic?",
-        ],
-        "Covariate analysis (Table 8)": [
+        "Covariate analysis (September 2026 analysis, not in the paper)": [
             "How does population density relate to EV uptake?",
             "How does income deprivation relate to EV adoption?",
             "Which LADs adopt above what their covariates predict?",
         ],
         "Custom datasets (download or map)": [
-            f"Extract a table of predicted {FORECAST_YEAR} keepership, turnover arrival quarter and charging-constraint class for all LADs.",
-            "Give me a dataset of keepership, chargers, deprivation, population and density for Cardiff, Swansea and Newport.",
+            f"Extract a table of predicted {FORECAST_YEAR} battery-electric cars, turnover arrival quarter and mean age of cars for all LADs.",
+            "Give me a dataset of battery-electric cars, chargers, deprivation, population and density for Cardiff, Swansea and Newport.",
         ],
         "Evidence & provenance": [
             "What generated this prediction?",
@@ -203,21 +205,23 @@ QUESTION_GROUPS = {
 
 MODE_DESCRIPTION = {
     "actual": "Actual Data mode retrieves observed RDF statements, metadata and provenance from CLEETS-KG-Enriched.",
-    "prediction": "Prediction mode queries the CLEETS Prediction KG: the paper's prediction types are listed below; "
+    "prediction": "Prediction mode queries the CLEETS Prediction KG: the prediction types are listed below; "
                   "'Auto' picks the type from the wording of the question.",
 }
 
 # Map metrics: key -> (label, kind, argument, unit, colorscale)
 MAP_METRICS = {
-    "pred_keepership_central": (f"Predicted BEV keepership {FORECAST_YEAR} (diffusion, central)", "pred", "central", "vehicles", "YlOrRd"),
-    "pred_keepership_high": (f"Predicted BEV keepership {FORECAST_YEAR} (diffusion, high)", "pred", "high", "vehicles", "OrRd"),
-    "pred_keepership_low": (f"Predicted BEV keepership {FORECAST_YEAR} (diffusion, low)", "pred", "low", "vehicles", "Blues"),
-    "pred_share_central": (f"Predicted BEV share of private vehicles {FORECAST_YEAR} (diffusion, central)", "share", "central", "%", "Purples"),
+    "pred_keepership_central": (f"Predicted private battery-electric cars {FORECAST_YEAR} (central)", "pred", "central", "cars", "YlOrRd"),
+    "pred_keepership_high": (f"Predicted private battery-electric cars {FORECAST_YEAR} (high)", "pred", "high", "cars", "OrRd"),
+    "pred_keepership_low": (f"Predicted private battery-electric cars {FORECAST_YEAR} (low)", "pred", "low", "cars", "Blues"),
+    "pred_share_central": (f"Predicted battery-electric share of private cars {FORECAST_YEAR} (central)", "share", "central", "%", "Purples"),
     "hier_lag": ("Hierarchical diffusion: lag against Welsh median midpoint (years)", "hier", "lag_vs_median_years", "years", "RdBu"),
-    "turnover_residual": ("Turnover scenario: residual non-BEV vehicles at 2053 Q4", "turnover", "residual_non_bev", "vehicles", "Reds"),
+    "turnover_residual": ("Turnover path: petrol and diesel cars at 2045 Q4", "turnover", "residual_non_bev", "cars", "Reds"),
+    "car_age": ("Mean age of private cars at 2026 Q2 (years)", "turnover", "mean_age_years", "years", "PuBu"),
     "charging_evs": ("Charging constraint: BEVs per public device at 2045", "charging", "evs_per_charge_point_2045", "BEVs/device", "Oranges"),
     "covariate_residual": ("Covariate residual: EVs per 1,000 residents above/below prediction", "covariates", "residual", "per 1,000", "RdBu"),
-    "obs_keepership": ("Observed private BEV keepership (latest quarter)", "obs", "keepership", "vehicles", "YlGnBu"),
+    "obs_bev_cars": ("Observed private battery-electric cars (latest quarter)", "obs", "bev_cars", "cars", "YlGnBu"),
+    "obs_keepership": ("Observed private BEV keepership, all body types (latest quarter)", "obs", "keepership", "vehicles", "YlGnBu"),
     "obs_chargers": ("Observed public charging devices (latest quarter)", "obs", "chargers", "devices", "Greens"),
     "obs_ratio": ("Observed keepers per charger (latest quarter)", "obs", "ratio", "keepers/charger", "Oranges"),
     "obs_chargers_per_100k": ("Observed chargers per 100k residents (latest quarter)", "obs", "chargers_per_100k", "per 100k", "Teal"),
@@ -467,7 +471,7 @@ def header():
             chip("Welsh LADs ", f"{len(kg.lad_names())}"),
             chip("Observed triples ", f"{len(kg.observed_kg):,}"),
             chip("Observations ", f"{n_obs:,}"),
-            chip("Quarterly forecasts ", f"{PRED_INV['prediction_count']:,}"),
+            chip("Quarterly predictions ", f"{PRED_INV['prediction_count']:,}"),
             chip("Prediction types ", f"{len(FAMILIES)}"),
             chip("Scenarios ", " / ".join(PRED_INV["scenarios"]) or "n/a"),
             chip("Horizon ", f"{PRED_INV['years'][0]}–{PRED_INV['years'][1]}"),
@@ -620,8 +624,8 @@ app.layout = html.Div([
                  style={"display": "none", "marginTop": "12px", "padding": "16px", "background": COLORS["pale2"],
                         "border": f"1px solid {COLORS['border']}", "borderRadius": "14px", "maxHeight": "430px", "overflowY": "auto"}),
         dcc.Textarea(id="question", value=flattened_questions("prediction")[0],
-                     placeholder="Ask in your own words: compare Cardiff and Swansea, when does Powys reach 99% BEV share, "
-                                 "give me a table of keepership and deprivation for all LADs...",
+                     placeholder="Ask in your own words: compare Cardiff and Swansea, when does Powys reach a 50% BEV share, "
+                                 "give me a table of battery-electric cars and deprivation for all LADs...",
                      style={"width": "100%", "height": "120px", "boxSizing": "border-box", "fontSize": "19px", "lineHeight": 1.5,
                             "padding": "16px", "border": f"2px solid {COLORS['border']}", "borderRadius": "14px",
                             "marginTop": "12px", "resize": "vertical", "fontFamily": "inherit"}),
@@ -665,7 +669,7 @@ app.layout = html.Div([
             html.Div([
                 html.Div("Columns", style={"fontWeight": 700, "fontSize": "15px", "marginBottom": "6px"}),
                 dcc.Checklist(id="ds-columns", options=[{"label": f" {lbl}", "value": key} for key, lbl in kg.dataset_columns()],
-                              value=["keepership", "chargers", "deprivation", "population", "density"],
+                              value=["bev_cars", "keepership", "chargers", "deprivation", "population", "density"],
                               inputStyle={"marginRight": "6px"}, labelStyle={"display": "block", "fontSize": "14px", "lineHeight": 1.7}),
             ]),
             html.Div([
@@ -762,7 +766,7 @@ def fill_question(_clicks, click_data, mode, current, selected):
                 else:
                     selected.append(lad)
                 if mode == "prediction":
-                    return f"What is {lad}'s predicted EV keepership in {FORECAST_YEAR} under the central scenario?", selected
+                    return f"How many private battery-electric cars are predicted for {lad} in {FORECAST_YEAR} under the central scenario?", selected
                 return f"What do you know about {lad}?", selected
         return current, no_update
     if isinstance(trig, dict):

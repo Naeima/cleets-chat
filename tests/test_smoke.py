@@ -32,7 +32,8 @@ def test_graphs_loaded(kg):
     assert len(kg.lad_names()) == 22
     inv = kg.prediction_inventory()
     assert inv["prediction_count"] > 5000 and inv["scenarios"] == ["central", "high", "low"]
-    assert {f["key"] for f in kg.prediction_families()} >= {"diffusion", "hierarchical", "turnover", "charging", "covariates"}
+    assert {f["key"] for f in kg.prediction_families()} >= {"diffusion", "hierarchical", "turnover", "neural", "charging", "covariates"}
+    assert kg.observation_years() == (2009, 2026)
 
 
 def test_every_help_question_answers(kg, question_groups):
@@ -47,56 +48,96 @@ def test_every_help_question_answers(kg, question_groups):
 
 
 def test_prediction_answers_cite_sources_and_type(kg):
-    md = qa.answer_question(kg, "What is Cardiff's predicted EV keepership in 2045 under the central scenario?", mode="prediction")
-    assert "154,923" in md and "5,977" in md and "**Sources:**" in md and "Prediction type:" in md
+    md = qa.answer_question(kg, "How many private battery-electric cars are predicted for Cardiff in 2045 under the central scenario?", mode="prediction")
+    assert "121,443" in md and "26,372" in md and "**Sources:**" in md and "Prediction type:" in md
+    assert all(t in md for t in ("VEH0105", "VEH0142", "VEH9901", "VEH1111"))
 
 
-def test_quarter_and_stock_remaining_answers(kg):
-    """Every district and quarter of the turnover-constrained projection is retrievable, with the stock that remains."""
+def test_quarter_and_cars_remaining_answers(kg):
+    """Every district and quarter of the capped predictions is retrievable, with the petrol and diesel cars that remain."""
     r = kg.prediction_quarter(2045, 4, "central", "Cardiff")
-    assert r["keepership"] == 154923 and r["non_bev_stock"] == 5977 and r["private_stock"] == 160900 and r["at_ceiling"] is True
+    assert r["keepership"] == 121443 and r["non_bev_stock"] == 26372 and r["private_stock"] == 147815 and r["on_path"] is True
+    assert round(r["path_share"], 4) == 0.8216 and r["fitted_share"] > r["path_share"]
+    r = kg.prediction_quarter(2030, 4, "central", "Cardiff")           # the value compared with the Cardiff road map in the paper
+    assert r["keepership"] == 18768 and round(r["adoption_share"], 3) == 0.127
     w = kg.area_prediction_quarter(2045, 4, "central")
-    assert abs(w["keepership"] - 1776283) <= 5 and abs(w["non_bev_stock"] - 74717) <= 5 and round(w["adoption_share"], 4) == 0.9596
+    assert abs(w["keepership"] - 1274581) <= 5 and abs(w["non_bev_stock"] - 296246) <= 5 and round(w["adoption_share"], 4) == 0.8114
+    assert round(kg.area_prediction_quarter(2045, 4, "low")["adoption_share"], 4) == 0.7532
+    assert round(kg.area_prediction_quarter(2045, 4, "high")["adoption_share"], 4) == 0.8835
     table = kg.prediction_table("central")
     assert len(table) == 22 * 80 and all(r["non_bev_stock"] is not None for r in table)
     assert all(abs(r["keepership"] + r["non_bev_stock"] - r["private_stock"]) <= 1 for r in table)
+    assert all(r["adoption_share"] <= min(r["fitted_share"], r["path_share"]) + 1e-6 for r in table)
+    assert sum(1 for r in table if r["on_path"]) == 1621               # district-quarters in which the path is the lower of the two
+    assert {m["period"] for m in kg.milestones("Bridgend", "central") if m["family"] == "diffusion" and m["threshold_share"] == 0.5} == {"2037-Q1"}
+    assert {m["period"] for m in kg.milestones("Ceredigion", "central") if m["family"] == "diffusion" and m["threshold_share"] == 0.5} == {"2040-Q1"}
     assert qa.extract_quarter("Cardiff in 2031 Q2") == qa.extract_quarter("Q2 2031") == qa.extract_quarter("second quarter of 2031") == (2031, 2)
-    md = qa.answer_question(kg, "What is Cardiff's predicted EV keepership in 2031 Q2?", mode="prediction")
-    assert "27,486" in md and "133,414" in md and "**Sources:**" in md
-    md = qa.answer_question(kg, "What is the stock remaining in Wales in 2040 Q4?", mode="prediction")
-    assert md.startswith("### Wales: 2040 Q4") and "non-BEV stock remaining" in md
-    full = qa.answer_question_rich(kg, "Give me a table of the quarterly predictions and stock remaining for all districts.", mode="prediction")
-    assert full["kind"] == "table" and len(full["table"]) == 23 * 80
-    one = qa.answer_question_rich(kg, "Give me a table of all districts in 2035 Q1 with the stock remaining.", mode="prediction")
+    md = qa.answer_question(kg, "How many private battery-electric cars are predicted for Cardiff in 2031 Q2?", mode="prediction")
+    assert "21,862" in md and "125,953" in md and "turnover path" in md and "**Sources:**" in md
+    md = qa.answer_question(kg, "How many petrol and diesel cars remain in Wales in 2040 Q4?", mode="prediction")
+    assert md.startswith("### Wales: 2040 Q4") and "petrol and diesel cars remaining" in md
+    full = qa.answer_question_rich(kg, "Give me a table of the quarterly predictions and cars remaining for all districts.", mode="prediction")
+    assert full["kind"] == "table" and len(full["table"]) == 23 * 80 and "Petrol and diesel cars remaining" in full["table"][0]
+    one = qa.answer_question_rich(kg, "Give me a table of all districts in 2035 Q1 with the cars remaining.", mode="prediction")
     assert one["kind"] == "table" and len(one["table"]) == 23
-    assert qa.detect_family("How much non-BEV stock remains in Powys in 2038 Q3?") == "diffusion"
-    assert qa.detect_family("How many non-BEV vehicles remain in Cardiff at 2053 under the turnover scenario?") == "turnover"
+    assert qa.detect_family("How many petrol and diesel cars remain in Powys in 2038 Q3?") == "diffusion"
+    assert qa.detect_family("How many petrol and diesel cars remain in Cardiff at 2053 on the turnover path?") == "turnover"
+
+
+def test_turnover_path_family(kg):
+    """District inputs and results of the turnover path, and the Wales path by scrappage period, as in the paper."""
+    rows = {r["lad_name"]: r for r in kg.turnover_rows()}
+    assert len(rows) == 22
+    assert rows["Bridgend"]["arrival_rank"] == 1 and rows["Bridgend"]["reaches_0.5"] == "2037-Q1" and round(rows["Bridgend"]["bev_share_2045"], 4) == 0.8615
+    assert rows["Ceredigion"]["arrival_rank"] == 22 and rows["Ceredigion"]["reaches_0.5"] == "2040-Q1" and round(rows["Ceredigion"]["bev_share_2045"], 4) == 0.7441
+    assert rows["Cardiff"]["private_cars"] == 147815 and rows["Cardiff"]["bev_cars_start"] == 3972 and rows["Cardiff"]["residual_non_bev"] == 26372
+    assert round(rows["Blaenau Gwent"]["first_year_entry_share"], 3) == 0.227 and round(rows["Ceredigion"]["mean_age_years"], 1) == 12.0
+    assert sum(1 for r in rows.values() if "reaches_0.9" not in r) == 2            # two districts are below 90% at 2053 Q4
+    paths = {c["scrappage_period"]: c for c in kg.turnover_ceilings() if c["model"] == "turnover path"}
+    assert round(paths["2021 to 2025"]["bev_share_2045"], 4) == 0.8114 and paths["2021 to 2025"]["residual_non_bev"] == 296246
+    assert round(paths["2014 to 2019"]["bev_share_2045"], 4) == 0.8835
+    weibull = {c["median_scrappage_years"]: c for c in kg.turnover_ceilings() if c["model"] == "Weibull ceiling"}
+    assert round(weibull[14.0]["bev_share_2045"], 4) == 0.9619
+    md = qa.answer_question(kg, "What is the turnover path for Ceredigion?", mode="prediction")
+    assert "74.4%" in md and "2040 Q1" in md and "A path, not a ceiling" in md and "VEH9901" in md
+    md = qa.answer_question(kg, "What is the Wales turnover path at 2045 under different scrappage rates?", mode="prediction")
+    assert "81.14%" in md and "88.35%" in md and "96.19%" in md
 
 
 def test_family_routing(kg):
-    assert qa.detect_family("When does Powys reach 99% BEV share under the 2032 phase-out?") == "turnover"
+    assert qa.detect_family("What is the turnover path for Powys?") == "turnover"
+    assert qa.detect_family("How old are the private cars in Blaenau Gwent?") == "turnover"
     assert qa.detect_family("Which LADs diffuse most slowly?") == "hierarchical"
     assert qa.detect_family("Where may charging provision be the principal constraint?") == "charging"
-    assert qa.detect_family("How well does the scenario-constrained neural network perform?") == "neural"
+    assert qa.detect_family("How well does the turnover-constrained neural network perform?") == "neural"
     assert qa.detect_family("How does income deprivation relate to EV adoption?") == "covariates"
     assert qa.detect_family("Compare Cardiff across all three scenarios in 2045.") == "diffusion"
+    assert qa.detect_family("When does Bridgend reach 50%?") == "diffusion"       # 'ridge' in Bridgend is not the Ridge model
 
 
 def test_dataset_table_and_sources(kg):
-    cols = ["keepership", "chargers", "deprivation", "population", "density", "pred_keepership_central", "turnover_reaches_99"]
+    cols = ["bev_cars", "keepership", "chargers", "deprivation", "population", "density", "pred_keepership_central", "turnover_reaches_50", "car_age"]
     rows = kg.dataset_table(cols)
     assert len(rows) == 22 and rows[0]["LAD"] == "Blaenau Gwent"
     cardiff = next(r for r in rows if r["LAD"] == "Cardiff")
-    assert cardiff["Private BEV keepership (latest)"] == 3214 and cardiff["Turnover: first quarter at 99% BEV share"] == "2048-Q3"
-    assert {s["label"] for s in kg.dataset_sources(cols)} >= {"VEH0132", "EVCI9001", "WIMD2025LocalAuthority"}
+    assert cardiff["Private battery-electric cars (latest)"] == 3972 and cardiff["Private battery-electric cars (latest) period"] == "2026-Q2"
+    assert cardiff["Private BEV keepership, all body types (latest)"] == 3214
+    assert cardiff["Turnover path: first quarter at 50% battery-electric share"] == "2038-Q2"
+    assert cardiff["Predicted private battery-electric cars, central scenario (2045-Q4)"] == 121443
+    assert {s["label"] for s in kg.dataset_sources(cols)} >= {"VEH0142", "VEH0132", "VEH0105", "VEH9901", "VEH1111", "EVCI9001", "WIMD2025LocalAuthority"}
     # Income deprivation is the published local authority percentage; the mean LSOA decile stays available by name.
     assert cardiff["People in income deprivation (%), WIMD 2025"] == 25.8 and rows[0]["People in income deprivation (%), WIMD 2025"] == 33.7
     both = kg.dataset_table(["deprivation", "deprivation_decile"])
     merthyr = next(r for r in both if r["LAD"] == "Merthyr Tydfil")
     assert merthyr["People in income deprivation (%), WIMD 2025"] == 30.5 and merthyr["Income deprivation, mean WIMD 2025 decile of LSOAs"] == 4.36
     assert {s["label"] for s in kg.dataset_sources(["deprivation_decile"])} >= {"WIMD2025"}
-    r = qa.answer_question_rich(kg, "Give me a table of keepership, chargers, deprivation, population and density for Cardiff and Swansea", mode="actual")
-    assert r["kind"] == "table" and len(r["table"]) == 2
+    r = qa.answer_question_rich(kg, "Give me a table of battery-electric cars, chargers, deprivation, population and density for Cardiff and Swansea", mode="actual")
+    assert r["kind"] == "table" and len(r["table"]) == 2 and r["table"][0]["Private battery-electric cars (latest)"] == 3972
+    # the car series are observed measures in their own right
+    assert kg.latest_observation("Cardiff", "car_stock")["value"] == 146700 and kg.latest_observation("Cardiff", "car_stock")["period"] == "2025-Q4"
+    assert len(kg.observations("Cardiff", "bev_cars")) == 67 and len(kg.observations("Cardiff", "car_stock")) == 65
+    md = qa.answer_question(kg, "How many private battery-electric cars does Cardiff have?", mode="actual")
+    assert "3,972" in md and "VEH0142" in md
 
 
 def test_methods_panels_have_no_unfilled_placeholders(kg):
@@ -106,40 +147,53 @@ def test_methods_panels_have_no_unfilled_placeholders(kg):
         assert not re.findall(r"\{\w+\}", text), fam
 
 
-def test_model_ranking_matches_table7(kg):
-    """Table 7 of the quarterly revision: lowest one-step-ahead MAE per target, Stage 13 logistic alongside."""
+def test_model_ranking_matches_the_paper(kg):
+    """The paper's model comparison: one-step-ahead MAE in cars, and the multi-horizon rows behind the choice of the logistic."""
     ranking = kg.model_ranking()
-    assert set(ranking) == {"EV chargers", "EV keepership"}
-    chargers = [(r["model"], r["mae"]) for r in ranking["EV chargers"]]
-    assert chargers[:3] == [("Persistence + drift", 9.344), ("Scenario-constrained NN", 9.784), ("Bounded logistic", 12.587)]
-    keep = [(r["model"], r["mae"]) for r in ranking["EV keepership"]]
-    assert keep[:3] == [("Persistence + drift", 17.879), ("Bounded logistic", 25.146), ("Scenario-constrained NN", 35.988)]
+    assert set(ranking) == {"Private battery-electric cars"}
+    cars = [(r["model"], r["mae"]) for r in ranking["Private battery-electric cars"]]
+    assert cars[:3] == [("Persistence + drift", 17.62), ("Turnover-constrained neural network", 18.89), ("Turnover-constrained graph neural network", 28.05)]
+    assert cars[3][1] == 28.51 and cars[4][1] == 260.41
     assert all(r["n"] == 352 and r["pooled_r2"] is not None for rows in ranking.values() for r in rows)
-    s13 = kg.logistic_backtest("chargers")
-    assert [r["scenario"] for r in s13["EV chargers"]] == ["Low", "Central", "High"]
+    horizons = {(r["model"], int(r["horizon"])): r["mae"] for r in kg.horizon_metrics()}
+    assert len(horizons) == 25 and horizons[("Persistence + drift", 8)] == 190.85
+    assert horizons[("Bounded logistic, full history from 2011 Q4 (the model behind the predictions)", 8)] == 169.68
+    md = qa.answer_question(kg, "Which model is most accurate?", mode="prediction")
+    assert "Persistence + drift" in md and "17.62" in md and "from 4 quarters ahead" in md and "**Sources:**" in md
     md = qa.answer_question(kg, "Which model is most accurate for EV chargers?", mode="prediction")
-    assert "Persistence + drift" in md and "9.34" in md and "no charger forecast to 2045" in md and "**Sources:**" in md
+    assert "charger counts are not predicted" in md
     assert qa.wants_accuracy("What is the keepership in Maesteg?") is False
 
 
 def test_every_resource_is_cited(kg):
-    """Every observation, prediction, family resource and activity reaches a complete dataset record."""
+    """Every observation, cube observation, prediction, family resource and activity reaches a complete dataset record."""
     audit = kg.citation_audit()
     assert audit["complete"], audit
-    assert audit["datasets_complete"] == audit["datasets_total"] >= 10
-    assert audit["resources_uncited"] == 0 and audit["resources_total"] > 16000
+    assert audit["datasets_complete"] == audit["datasets_total"] >= 13
+    assert audit["resources_uncited"] == 0 and audit["resources_total"] > 25000
+    cube = next(r for r in audit["resources"] if r["class"] == "qb:Observation")
+    assert cube["total"] == 5170 and cube["uncited"] == 0
     assert audit["activities_uncited"] == 0 and len(audit["activities"]) == 6
     md = qa.answer_question(kg, "Are all resources properly cited?", mode="actual")
-    assert md.startswith("### Are all resources cited?") and "**Yes.**" in md
+    assert md.startswith("### Are all resources cited?") and "**Yes.**" in md and "VEH9901" in md
 
 
 def test_about_description(kg):
     """The About text is filled from the graphs: datasets, counts and the scalability section."""
     from about import about_content, about_markdown
     c = about_content(kg)
-    assert c["facts"]["lads"] == 22 and c["facts"]["sources"] >= 6
-    assert {r["Dataset"] for r in c["datasets"]} >= {"VEH0132", "VEH0105", "EVCI9001", "StatsWalesPopulation", "ONSDensity", "WIMD2025"}
-    veh = next(r for r in c["datasets"] if r["Dataset"] == "VEH0132")
-    assert "private BEV keepership" in veh["Measures supplied"] and veh["Licence"] == "OGL v3.0"
+    assert c["facts"]["lads"] == 22 and c["facts"]["sources"] == 10 and c["facts"]["cube_observations"] == 5170
+    by_id = {r["Dataset"]: r for r in c["datasets"]}
+    assert set(by_id) >= {"VEH0105", "VEH0132", "VEH0142", "VEH9901", "VEH1111", "EVCI9001", "StatsWalesPopulation", "ONSDensity", "WIMD2025",
+                          "WIMD2025LocalAuthority"}
+    assert all(by_id[k]["Role"] == "Source dataset" and by_id[k]["Licence"] == "OGL v3.0" for k in ("VEH0142", "VEH9901", "VEH1111"))
+    assert by_id["VEH0142"]["Measures supplied"] == "private battery-electric cars" and by_id["VEH0142"]["Observations"] == 1474
+    assert by_id["VEH0142"]["Coverage"] == "2009-Q4 to 2026-Q2"
+    assert "year of first registration" in by_id["VEH9901"]["Measures supplied"] and by_id["VEH9901"]["Observations"] == 1723
+    assert by_id["VEH9901"]["Coverage"] == "2026-Q2"
+    assert "year of first use" in by_id["VEH1111"]["Measures supplied"] and "Great Britain" in by_id["VEH1111"]["Measures supplied"]
+    assert by_id["VEH1111"]["Observations"] == 3447 and by_id["VEH1111"]["Coverage"] == "2009-Q4 to 2025-Q4"
+    assert "private cars (all fuels)" in by_id["VEH0105"]["Measures supplied"] and by_id["VEH0105"]["Observations"] == 4136
+    assert "private BEV keepership" in by_id["VEH0132"]["Measures supplied"]
     md = about_markdown(kg)
-    assert "ontology-based knowledge graph" in md and "Scalable to more datasets" in md
+    assert "ontology-based knowledge graph" in md and "Scalable to more datasets" in md and "VEH9901" in md

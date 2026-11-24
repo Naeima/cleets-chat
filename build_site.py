@@ -77,7 +77,7 @@ def main():
         "centroids": app.LAD_CENTROIDS,
         "lads": kg.lad_names(),
         "dataset_columns": kg.dataset_columns(),
-        "default_columns": ["keepership", "chargers", "deprivation", "population", "density"],
+        "default_columns": ["bev_cars", "keepership", "chargers", "deprivation", "population", "density"],
         "about": about_content(kg),
     }
     (DOCS / "data" / "site_meta.json").write_text(json.dumps(meta, separators=(",", ":")), encoding="utf-8")

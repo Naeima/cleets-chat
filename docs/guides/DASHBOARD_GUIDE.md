@@ -6,7 +6,7 @@
 
 Features:
 - Full-width Leaflet/Plotly choropleth map (LAD boundaries color-coded by metric)
-- Toggleable metrics: predicted keepership (3 scenarios), adoption share
+- Toggleable metrics: predicted private battery-electric cars (3 scenarios), their share of private cars
 - Click LAD → prefill chatbot question + show popup stats
 - Natural-language answers powered by Claude Haiku (humanization optional)
 - Citation layer: all sources linked to official datasets
@@ -61,7 +61,7 @@ Open: http://localhost:8050
 
 ## Usage: End User
 
-1. **Select metric** from dropdown (e.g., "Predicted BEV Keepership 2045 Central")
+1. **Select metric** from dropdown (e.g., "Predicted private battery-electric cars 2045 (central)")
 2. **View map:** LADs colored by metric value (darker = higher)
 3. **Click a LAD** on the map → Chatbot input auto-fills with "Tell me about [LAD]"
 4. **Ask a question** (or press Submit on auto-filled input)

@@ -75,12 +75,13 @@ STOCK_WORDS = ("stock remaining", "remaining stock", "stock that remains", "stoc
                "vehicles remain", "cars remain", "still remain", "remaining vehicles", "remaining cars", "remaining non",
                "non-bev", "non bev", "non-electric", "non electric", "not electric", "not yet electric",
                "decreasing stock", "declining stock", "stock decline", "left on the road", "still on the road",
-               "how many remain", "remaining")
+               "how many remain", "remaining", "petrol", "diesel", "combustion")
 QUARTERLY_WORDS = ("quarterly", "per quarter", "each quarter", "every quarter", "by quarter", "all quarters", "quarter by quarter",
                    "quarter-by-quarter", "time series", "trajectory", "year by year", "each year", "every year", "per year", "over time")
-# Words that point at the separate age-structured turnover family rather than the quarterly projection.
-TURNOVER_ONLY = ("2053", "turnover", "scrappage", "age-structured", "structural age", "vintage", "arrival", "99%", "99 per",
-                 "phase-out", "phase out", "sales ban", "residual")
+# Words that point at the turnover family (district inputs and Wales-wide results of the turnover model) rather than
+# the quarterly predictions, which already carry each district's turnover path quarter by quarter.
+TURNOVER_ONLY = ("2053", "scrappage", "second-hand", "second hand", "used car", "mean age", "how old", "age of", "oldest", "older cars",
+                 "vintage", "arrival", "weibull", "sales rule", "sales ban", "phase-out", "phase out", "residual")
 
 
 def wants_stock(question: str) -> bool:
@@ -217,7 +218,10 @@ def _metric_table(rows, with_target: bool = False, rank: bool = False):
             r["Rank"] = i
         if with_target:
             r["Target"] = m["target"]
-        r.update({"Model": m["model"], "Scenario": m.get("scenario") or "-", "MAE": m["mae"], "RMSE": m["rmse"], "R2 (mean per LAD)": m["r2"]})
+        r["Model"] = m["model"]
+        if any(x.get("scenario") for x in rows):
+            r["Scenario"] = m.get("scenario") or "-"
+        r.update({"MAE": m["mae"], "RMSE": m["rmse"], "R2 (mean per LAD)": m["r2"]})
         if m.get("pooled_r2") is not None:
             r["Pooled R2"] = m["pooled_r2"]
         if m.get("n") is not None:
@@ -237,9 +241,46 @@ def _target_key(question: str):
     q = question.casefold()
     if any(w in q for w in ("charger", "charging", "charge point", "chargepoint", "evci")):
         return "chargers"
-    if any(w in q for w in ("keepership", "keeper", "bev count", "ev count", "vehicles", "adoption")):
-        return "keepership"
+    if any(w in q for w in ("keepership", "keeper", "bev count", "ev count", "vehicles", "adoption", "cars")):
+        return "cars"
     return None
+
+
+def _horizon_line(kg) -> str:
+    """One sentence comparing the full-history logistic with drift at each horizon (multi-horizon backtest rows)."""
+    rows = kg.horizon_metrics() if hasattr(kg, "horizon_metrics") else []
+    if not rows:
+        return ""
+    by = defaultdict(dict)
+    for r in rows:
+        by[r["model"]][int(r["horizon"])] = r["mae"]
+    logi = next((m for m in by if m.lower().startswith("bounded logistic, full history")), None)
+    drift = next((m for m in by if "drift" in m.lower()), None)
+    if not (logi and drift):
+        return ""
+    hs = [h for h in sorted(by[logi]) if h > 1 and h in by[drift]]
+    lowest = lambda h: by[logi][h] <= min(v[h] for v in by.values() if h in v) + 1e-9
+    best_from = next((h for h in hs if all(lowest(k) for k in hs if k >= h)), None)
+    comp = ", ".join(f"{by[logi][h]:.1f} against {by[drift][h]:.1f} at {h} quarters" for h in hs)
+    lead = (f"Rolled forward from the same origins, the logistic fitted to the full history has the lowest MAE of the {len(by)} models from "
+            f"{best_from} quarters ahead" if best_from else
+            "Rolled forward from the same origins, the logistic fitted to the full history compares with drift as follows")
+    return f"{lead} (MAE in cars, logistic against drift: {comp}), which is why it is the curve that the turnover path caps."
+
+
+def _backtest_line(kg) -> str:
+    """The bounded logistic in the one-step comparison and at longer horizons, read from the model-comparison rows."""
+    ranking = kg.model_ranking() if hasattr(kg, "model_ranking") else {}
+    rows = next(iter(ranking.values()), [])
+    logi = next((r for r in rows if r["model"].lower().startswith("bounded logistic")), None)
+    if not logi:
+        return "No backtest metrics are loaded."
+    best = rows[0]
+    out = (f"One quarter ahead, on {_fmt(logi.get('n'), digits=0)} held-out district-quarters, the bounded logistic (refitted to each training window, "
+           f"without the cap) has an MAE of **{_fmt(logi['mae'])}** cars")
+    if best is not logi:
+        out += f" against **{_fmt(best['mae'])}** for {best['model'].lower()}"
+    return (out + ". " + _horizon_line(kg)).strip()
 
 
 def _best_line(kg) -> str:
@@ -266,34 +307,36 @@ def _example_diffusion(kg) -> str:
     lad = _pick_lad(kg)
     if not lad:
         return ""
-    keep = kg.latest_observation(lad, "keepership")
-    stock = kg.latest_observation(lad, "vehicle_stock")
+    cars = kg.latest_observation(lad, "bev_cars")
     rows = {y: kg.prediction_rows(y, "central", lad, family="diffusion") for y in (2030, 2035, 2045)}
-    if not keep or not all(rows.values()):
+    if not cars or not all(rows.values()):
         return "The loaded graphs do not contain enough values for a worked example."
-    parts = [f"Think of {lad}. At {keep['period']} it had **{_fmt(keep['value'])}** privately kept battery-electric vehicles"]
-    if stock and stock["value"]:
-        parts[-1] += (f" out of **{_fmt(stock['value'])}** private vehicles ({stock['period']}), a share of "
-                      f"**{keep['value'] / stock['value']:.1%}**")
-    parts[-1] += (". The curve treats adoption like the spread of any new technology, smartphones for instance: slow at first, "
+    last = rows[2045][-1]
+    stock = last.get("private_stock")
+    parts = [f"Think of {lad}. At {cars['period']} it had **{_fmt(cars['value'])}** privately kept battery-electric cars"]
+    if stock:
+        parts[-1] += f" among about **{_fmt(stock)}** private cars, a share of **{cars['value'] / stock:.1%}**"
+    parts[-1] += (". The fitted curve treats adoption like the spread of any new technology, smartphones for instance: slow at first, "
                   "fastest in the middle years, then levelling off as the market fills up.")
+    parts.append("The turnover path asks a different question: given how long cars last and how they reach private keepers, new or second hand, "
+                 "how many battery-electric cars can the sales rule put on the road by each date? The prediction is the lower of the two.")
     ms = {m["threshold_share"]: m["period"] for m in kg.milestones(lad, "central") if m.get("family", "diffusion") == "diffusion"}
     mid = ms.get(0.5)
     steps = "; ".join(f"**{_fmt(r[-1]['keepership'])}** ({r[-1]['adoption_share']:.1%}) at {r[-1]['period']}" for r in rows.values())
-    parts.append(f"Under the central scenario {lad}'s curve"
-                 + (f" passes the halfway mark in **{mid}** and" if mid else "")
-                 + f" gives {steps}.")
+    parts.append(f"Under the central scenario {lad}" + (f" passes the halfway mark in **{mid}** and" if mid else "") + f" has {steps}.")
+    if last.get("fitted_share") is not None and last.get("path_share") is not None:
+        parts.append(f"At {last['period']} the fitted curve alone would give {last['fitted_share']:.1%} and the turnover path {last['path_share']:.1%}; "
+                     f"the prediction is {'the path' if last.get('on_path') else 'the curve'}.")
     lo = kg.prediction_rows(2045, "low", lad, family="diffusion"); hi = kg.prediction_rows(2045, "high", lad, family="diffusion")
     if lo and hi:
-        parts.append(f"The low and high scenarios cap the same curve with a ceiling for longer-lived (16-year) or shorter-lived (12-year) "
-                     f"vehicles, giving **{_fmt(lo[-1]['keepership'])}** and **{_fmt(hi[-1]['keepership'])}** vehicles at {lo[-1]['period']}.")
-    last = rows[2045][-1]
+        parts.append(f"A weaker sales rule (low scenario) gives **{_fmt(lo[-1]['keepership'])}** battery-electric cars at {lo[-1]['period']}, and "
+                     f"faster scrappage (high scenario) **{_fmt(hi[-1]['keepership'])}**.")
     if last.get("non_bev_stock") is not None:
-        parts.append(f"What is left is the stock remaining: **{_fmt(last['non_bev_stock'])}** vehicles in {lad} are still not battery "
-                     f"electric at {last['period']} under the central scenario.")
-    if stock and stock["value"]:
-        parts.append(f"Every count is the predicted share multiplied by the {_fmt(stock['value'])} vehicles {lad} had at {stock['period']}, "
-                     "so a growing or shrinking future fleet is not part of the picture.")
+        parts.append(f"What is left are the cars that remain: **{_fmt(last['non_bev_stock'])}** petrol and diesel cars, hybrids included, are still "
+                     f"in private keepership in {lad} at {last['period']} under the central scenario.")
+    if stock:
+        parts.append(f"Every count is the predicted share multiplied by the {_fmt(stock)} private cars {lad} had at 2026 Q2, "
+                     "so a growing or shrinking stock is not part of the picture.")
     return " ".join(parts)
 
 
@@ -304,7 +347,7 @@ def _example_hierarchical(kg) -> str:
     slow, fast = rows[0], rows[-1]
     lad = _pick_lad(kg)
     mine = next((r for r in rows if r["lad_name"] == lad), None)
-    parts = [f"The midpoint is the quarter in which a district's curve reaches half of its ceiling. **{slow['lad_name']}** is the slowest district: "
+    parts = [f"The midpoint is the quarter in which a district's fitted curve reaches a 50% share. **{slow['lad_name']}** is the slowest district: "
              f"its midpoint is **{slow['midpoint_period']}**, {abs(slow['lag_vs_median_years']):.1f} years "
              f"{'behind' if slow['lag_vs_median_years'] > 0 else 'ahead of'} the Welsh median, while **{fast['lad_name']}** is the fastest at "
              f"**{fast['midpoint_period']}** ({abs(fast['lag_vs_median_years']):.1f} years {'ahead' if fast['lag_vs_median_years'] < 0 else 'behind'})."]
@@ -326,20 +369,33 @@ def _example_turnover(kg) -> str:
     if not rows:
         return "No turnover results are loaded, so there is no worked example."
     r = rows[0]
-    stock = kg.latest_observation(lad, "vehicle_stock")
-    ce = {c["median_scrappage_years"]: c for c in kg.turnover_ceilings()} if hasattr(kg, "turnover_ceilings") else {}
-    c14 = ce.get(14.0) or ce.get(14)
-    parts = [f"Picture {lad}'s" + (f" **{_fmt(stock['value'])}**" if stock else "") + " private vehicles as a queue in which the oldest are scrapped and replaced"
-             + (f", about {c14['implied_annual_replacement_pct']:.1f}% of the fleet a year when a vehicle lasts a median 14 years" if c14 else "")
-             + ". From 2033 every replacement is a BEV, so the BEV share can rise only as fast as the old vehicles leave."]
-    parts.append(f"For {lad} that gives a BEV share of **{r['bev_share_2045']:.1%}** at 2045 Q4"
-                 + (f", 95% first reached in **{r['reaches_0.95']}**" if r.get("reaches_0.95") else "")
-                 + (f" and 99% in **{r['reaches_0.99']}**" if r.get("reaches_0.99") else "")
-                 + (f", with about **{_fmt(round(r['residual_non_bev']))}** non-BEV vehicles still on the road at 2053 Q4" if r.get("residual_non_bev") is not None else "")
-                 + ".")
-    if ce:
-        parts.append("Wales-wide, the 2045 share is " + ", ".join(f"**{c['bev_share_2045']:.1%}** if vehicles last {c['median_scrappage_years']:g} years"
-                                                                   for c in sorted(ce.values(), key=lambda x: x["median_scrappage_years"])) + ".")
+    ce = kg.turnover_ceilings() if hasattr(kg, "turnover_ceilings") else []
+    paths = [c for c in ce if c.get("model") == "turnover path"]
+    weib = [c for c in ce if c.get("model") == "Weibull ceiling"]
+    central = next((c for c in paths if c.get("scrappage_period") == "2021 to 2025"), paths[-1] if paths else None)
+    parts = [f"Picture {lad}'s" + (f" **{_fmt(r['private_cars'])}**" if r.get("private_cars") else "") + " private cars as a queue. Each quarter some "
+             "cars leave it, at the rates at which cars of their age have recently been scrapped, and the same number join it."]
+    if r.get("first_year_entry_share") is not None:
+        parts.append(f"Only **{r['first_year_entry_share']:.0%}** of the cars that join are in their first year; the rest arrive second hand, "
+                     "with the fuel mix of the year in which they were first registered.")
+    if r.get("mean_age_years") is not None:
+        parts.append(f"{lad}'s private cars are **{r['mean_age_years']:.1f}** years old on average"
+                     + (f", and {r['share_aged_15_plus']:.0%} are 15 or older" if r.get("share_aged_15_plus") is not None else "") + ".")
+    parts.append(f"With the battery-electric share of new cars rising to 80% in 2030 and 100% in 2035, that gives {lad} a battery-electric share of "
+                 + (f"**{r['bev_share_2035']:.1%}** at 2035 Q1 and " if r.get("bev_share_2035") is not None else "")
+                 + f"**{r['bev_share_2045']:.1%}** at 2045 Q4"
+                 + (f", with 50% first reached in **{r['reaches_0.5']}**" if r.get("reaches_0.5") else "")
+                 + (f" and about **{_fmt(round(r['residual_non_bev']))}** petrol and diesel cars still in private keepership at 2045 Q4"
+                    if r.get("residual_non_bev") is not None else "") + ".")
+    if central:
+        others = [c for c in paths if c is not central]
+        parts.append(f"Wales-wide the path reaches **{central['bev_share_2045']:.1%}** at 2045 Q4 on the scrappage rates of {central['scrappage_period']} "
+                     f"(median life {central['median_scrappage_years']:.1f} years)"
+                     + "".join(f", and {c['bev_share_2045']:.1%} on those of {c['scrappage_period']} ({c['median_scrappage_years']:.1f} years)" for c in others) + ".")
+    w14 = next((c for c in weib if abs((c["median_scrappage_years"] or 0) - 14) < 0.01), None)
+    if w14 and central:
+        parts.append(f"A Weibull ceiling that assumes a 14-year median life and replaces every scrapped car with a new one gives "
+                     f"**{w14['bev_share_2045']:.1%}**, {100 * (w14['bev_share_2045'] - central['bev_share_2045']):.1f} points more.")
     return " ".join(parts)
 
 
@@ -352,7 +408,7 @@ def _example_charging(kg) -> str:
     lad = r["lad_name"]
     chg = kg.latest_observation(lad, "chargers")
     stock = kg.latest_observation(lad, "vehicle_stock")
-    turn = (kg.turnover_rows(lad) or [None])[0] if hasattr(kg, "turnover_rows") else None
+    turn = None      # the stored assessment rests on the September 2026 turnover run, not on the turnover path
     parts = [f"Take **{lad}**" + (f", which has **{_fmt(chg['value'])}** public charging devices ({chg['period']})" if chg else "") + "."]
     if turn and stock:
         bevs = turn["bev_share_2045"] * stock["value"]
@@ -374,7 +430,7 @@ def _example_charging(kg) -> str:
 
 
 def _drift_fold(kg, lad, measure, label, unit):
-    """One rolling-origin fold of the persistence + drift baseline, computed exactly as Stage 14 does:
+    """One rolling-origin fold of the persistence + drift baseline, computed as the notebook does:
     prediction = last training value + (last - value five quarters back) / 4."""
     obs = [o for o in kg.observations(lad, measure) if o["value"] is not None and o["quarter"]]
     obs = [o for o in obs if (o["year"], o["quarter"]) <= (2025, 4)]
@@ -397,8 +453,8 @@ def _drift_fold(kg, lad, measure, label, unit):
     return (f"For {lad}'s {label} at **{test['period']}** the training data stop at {last['period']} ({_fmt(last['value'])} {unit}). "
             f"The drift baseline adds the average quarterly change of the previous year, ({_fmt(last['value'])} − {_fmt(back5['value'])}) / 4 = "
             f"{d:+.1f}, and predicts **{_fmt(round(pred))}**; the actual value was **{_fmt(test['value'])}**, a miss of about {abs(pred - test['value']):.0f} {unit}. "
-            f"The scenario-constrained network sees the same history plus a ceiling K = 10 × {_fmt(last['value'])} = {_fmt(10 * last['value'])} "
-            f"under the central scenario (6× low, 15× high).")
+            f"The turnover-constrained network sees the same history but predicts what share of the cars entering private keepership that "
+            f"quarter are battery electric, so it cannot add more cars than enter.")
 
 
 def _example_neural(kg) -> str:
@@ -407,15 +463,14 @@ def _example_neural(kg) -> str:
         return ""
     parts = ["Each model is tested the way a weather forecast is: it is shown history up to one quarter, asked for the next, and scored "
              "against what really happened, for every district and every quarter from 2022 Q1 to 2025 Q4."]
-    for measure, label, unit in (("chargers", "public charging devices", "devices"), ("keepership", "BEV keepership", "vehicles")):
+    for measure, label, unit in (("bev_cars", "private battery-electric cars", "cars"),):
         f = _drift_fold(kg, lad, measure, label, unit)
         if f:
             parts.append(f)
     best = kg.best_models() if hasattr(kg, "best_models") else {}
     if best:
         parts.append("The MAE in the table is the average size of such misses over the 352 district-quarters: "
-                     + "; ".join(f"**{_fmt(b['mae'])}** {('devices' if 'charger' in t.lower() else 'vehicles')} for {b['model']} on {t}"
-                                 for t, b in best.items())
+                     + "; ".join(f"**{_fmt(b['mae'])}** cars for {b['model']}" for t, b in best.items())
                      + ". R2 near 1 means the model follows each district's ups and downs closely; a negative R2 means it does worse than "
                        "simply guessing the district's average.")
     return " ".join(parts)
@@ -472,15 +527,23 @@ def methods_text(kg, family: str) -> str:
 
     if family == "diffusion":
         act = kg.prediction_activity() if hasattr(kg, "prediction_activity") else {}
+        order = {"central": 0, "low": 1, "high": 2}
         lines = []
-        for s in sorted(act.get("scenarios", []), key=lambda x: x.get("terminal_target_share") or 0):
-            tts = s.get("terminal_target_share"); sh = s.get("midpoint_shift_quarters")
+        for s in sorted(act.get("scenarios", []), key=lambda x: order.get(x["scenario"], 9)):
+            tts = s.get("terminal_target_share")
             if tts is not None:
-                age = s.get("median_scrappage_years")
-                lines.append(f"**{s['scenario']}**: Wales ceiling {tts:.2%} of the private stock at 2045 Q4"
-                             + (f" ({age:.0f}-year median scrappage age)" if age is not None else "")
-                             + (f" (midpoint shift {sh:+.2f} quarters)" if sh else ""))
-        fill["scenario_lines"] = ("Scenario ceilings in the KG: " + "; ".join(lines) + ".") if lines else ""
+                level = s.get("sales_share_2030")
+                lines.append(f"**{s['scenario']}** ("
+                             + (f"{level:.0%} of new cars battery electric in 2030, " if level is not None else "")
+                             + (f"scrappage rates of {s['scrappage_period']}" if s.get("scrappage_period") else "")
+                             + f"): Wales path {tts:.2%} of private cars at 2045 Q4")
+        fill["scenario_lines"] = ("Scenarios in the KG: " + "; ".join(lines) + ".") if lines else ""
+        flagged = [r for r in (kg.prediction_table("central") if hasattr(kg, "prediction_table") else []) if r.get("on_path") is not None]
+        if flagged:
+            n_on = sum(1 for r in flagged if r["on_path"])
+            fill["cap_line"] = (f"Under the central scenario the turnover path is the lower of the two in **{n_on:,} of {len(flagged):,}** "
+                                "district-quarters.")
+        fill["backtest_line"] = _backtest_line(kg)
 
     if family in ("hierarchical", "covariates"):
         eff = kg.covariate_effects() if hasattr(kg, "covariate_effects") else []
@@ -494,35 +557,26 @@ def methods_text(kg, family: str) -> str:
 
     if family == "turnover":
         ce = kg.turnover_ceilings() if hasattr(kg, "turnover_ceilings") else []
-        if ce:
-            fill["ceilings"] = "Wales-wide ceilings at 2045 Q4 in the loaded run: " + "; ".join(
-                f"median scrappage {c['median_scrappage_years']:g} years → **{c['bev_share_2045']:.1%}** BEV share"
-                f" ({_fmt(c['residual_non_bev'])} residual non-BEV vehicles)" for c in ce) + "."
-
-    if family == "diffusion":
-        s13 = kg.logistic_backtest() if hasattr(kg, "logistic_backtest") else {}
-        if s13:
-            rows = [r for rs in s13.values() for r in rs]
-            fill["metrics_stage13"] = ("\n\nStage 13, bounded logistic re-run off the released KG (rolling-origin one-step-ahead, "
-                                       f"{_fmt(rows[0].get('n'), digits=0)} held-out LAD-quarters per row, loaded run):\n\n"
-                                       + md_table(_metric_table(rows)))
-        else:
-            fill["metrics_stage13"] = ""
+        paths = [c for c in ce if c.get("model") == "turnover path"]
+        weib = [c for c in ce if c.get("model") == "Weibull ceiling"]
+        bits = []
+        if paths:
+            bits.append("Wales path at 2045 Q4 in the loaded run: " + "; ".join(
+                f"scrappage rates of {c['scrappage_period']} (median life {c['median_scrappage_years']:.1f} years) → **{c['bev_share_2045']:.1%}**"
+                + (f" ({_fmt(c['residual_non_bev'])} petrol and diesel cars left)" if c.get("residual_non_bev") is not None else "") for c in paths) + ".")
+        if weib:
+            bits.append("Weibull ceiling: " + "; ".join(f"{c['median_scrappage_years']:g}-year median life → {c['bev_share_2045']:.1%}" for c in weib) + ".")
+        fill["ceilings"] = " ".join(bits)
 
     if family == "neural":
-        m7 = [m for m in kg.model_metrics("neural") if "Table 7" in m.get("note", "")] if hasattr(kg, "model_metrics") else []
-        m6 = [m for m in kg.model_metrics("neural") if "Stage 6e" in m.get("note", "")] if hasattr(kg, "model_metrics") else []
-        if m7:
-            fill["metrics_table7"] = (f"\n\nTable 7, best configuration per approach ({_protocol_label(m7)}; loaded run):\n\n"
-                                      + md_table(_metric_table(m7, with_target=True)))
+        rows = next(iter((kg.model_ranking() if hasattr(kg, "model_ranking") else {}).values()), [])
+        if rows:
+            fill["metrics_comparison"] = (f"\n\nModel comparison ({_protocol_label(rows)}; MAE and RMSE in cars, loaded run):\n\n"
+                                          + md_table(_metric_table(rows, rank=True)))
             fill["best_line"] = _best_line(kg)
-        if m6:
-            fill["metrics_6e"] = "\n\nStage 6e walk-forward on first differences (pp, loaded run):\n\n" + md_table(
-                [{"Model": m["model"], "MAE (pp)": m["mae"], "RMSE (pp)": m["rmse"], "R2 diff": m["r2"]} for m in m6])
-        fam_n = (fam or {}).get("predictions", 0)
-        fill["forecast_note"] = ("Per-LAD quarterly neural forecasts to 2030 Q4 are loaded." if fam_n else
-                                 "No per-LAD network forecast is in the loaded KG (the quarterly notebook produces evaluation "
-                                 "metrics only); the 2045 scenarios come from the bounded logistic.")
+        fill["horizons"] = _horizon_line(kg)
+        fill["forecast_note"] = ("The networks are evaluated only: no network prediction to 2045 is in the KG, and the quarterly predictions "
+                                 "come from the bounded logistic capped by the turnover path.")
 
     if family == "covariates":
         m8 = kg.model_metrics("covariates") if hasattr(kg, "model_metrics") else []
@@ -549,21 +603,24 @@ def methods_text(kg, family: str) -> str:
 
 # --------------------------------------------------------------------------- family detection
 FAMILY_KEYWORDS = [
-    ("turnover", ("turnover", "scrappage", "phase-out", "phase out", "sales ban", "ban", "2053", "arrival", "residual",
-                  "ice ", "non-bev", "age-structured", "structural age", "vintage", "ceiling", "fleet")),
+    # the model comparison is checked first: "turnover-constrained neural network" is a question about the networks
+    ("neural", ("neural", " nn", "gnn", "perceptron", "graph neural", "walk-forward", "walk forward", "table 6", "table 7", "mlp")),
+    ("turnover", ("turnover", "scrappage", "second-hand", "second hand", "used car", "phase-out", "phase out", "sales ban", "sales rule",
+                  " ban ", "2053", "arrival", "residual", "ice ", "non-bev", "mean age", "how old", "age of", "oldest", "older cars", "vintage",
+                  "ceiling", "weibull",
+                  "fleet")),
     ("hierarchical", ("hierarchical", "midpoint", "slowest", "fastest", "diffuse", "diffusion rate", "empirical bayes",
                       "pooling", "shrink", "rate per quarter", "lag")),
     ("charging", ("charging constraint", "provision", "binding", "chargers per", "bevs per", "charge point", "charging provision")),
-    ("neural", ("neural", " nn", "gnn", "perceptron", "graph neural", "walk-forward", "walk forward", "table 6", "table 7", "mlp")),
-    ("covariates", ("covariate", "ridge", "random forest", "extra trees", "leave-one-out", "table 8", "relate", "relationship",
+    ("covariates", ("covariate", " ridge", "random forest", "extra trees", "leave-one-out", "table 8", "relate", "relationship",
                     "correlat", "what makes", "population density", "deprivation")),
 ]
 
 
 def detect_family(question: str, default: str = "diffusion") -> str:
     q = " " + question.casefold() + " "
-    # Quarter-level questions and questions on the stock that remains are answered from the quarterly projection,
-    # unless the wording points at the age-structured turnover run.
+    # Quarter-level questions and questions on the cars that remain are answered from the quarterly predictions,
+    # unless the wording points at the inputs or Wales-wide results of the turnover model.
     if (extract_quarter(question) or wants_stock(question) or wants_quarterly(question)) and not any(w in q for w in TURNOVER_ONLY):
         return "diffusion"
     for key, words in FAMILY_KEYWORDS:
@@ -583,6 +640,8 @@ TABLE_TRIGGERS = ("table", "csv", "download", "extract", "export", "spreadsheet"
 TABLE_WEAK = ("dataset", "data set", "list the", "pull")
 TABLE_VERBS = ("give", "build", "create", "make", "get", "generate", "prepare", "want", "need", "show me a", "produce", "compile")
 COLUMN_KEYWORDS = [
+    ("bev_cars", ("battery-electric car", "battery electric car", "electric car", "bev car")),
+    ("car_stock", ("private car", "car stock", "licensed car")),
     ("keepership", ("keepership", "keeper", "bev count", "ev count", "electric vehicle")),
     ("chargers", ("charger", "charging count", "charging device", "chargepoint", "charge point")),
     ("ratio", ("keepers per charger", "ratio")),
@@ -595,13 +654,15 @@ COLUMN_KEYWORDS = [
     ("deprivation", ("deprivation", "wimd", "income")),
     ("hier_midpoint", ("midpoint", "hierarchical")),
     ("hier_rate", ("diffusion rate", "rate per quarter")),
-    ("turnover_share_2045", ("turnover", "ceiling", "phase-out", "ban")),
-    ("turnover_reaches_99", ("arrival", "reaches 99", "99%")),
-    ("turnover_residual", ("residual non-bev", "residual ice", "non-bev")),
+    ("turnover_share_2045", ("turnover", "ceiling", "phase-out", "sales rule")),
+    ("turnover_reaches_50", ("arrival", "reaches 50", "50%", "halfway")),
+    ("turnover_residual", ("residual", "petrol and diesel", "non-bev")),
+    ("car_age", ("mean age", "age of", "how old")),
+    ("first_year_entry", ("first-year", "first year", "second-hand", "second hand")),
     ("charging_class", ("charging constraint", "constraint class", "binding")),
     ("covariate_residual", ("covariate residual", "ridge residual")),
 ]
-DEFAULT_TABLE_COLUMNS = ["keepership", "chargers", "deprivation", "population", "density"]
+DEFAULT_TABLE_COLUMNS = ["bev_cars", "keepership", "chargers", "deprivation", "population", "density"]
 
 
 def wants_table(question: str) -> bool:
@@ -653,26 +714,28 @@ def table_answer(kg, question: str, mode: str = "actual") -> dict:
     return {"markdown": md, "table": rows, "columns": cols, "kind": "table", "family": None, "sources": links}
 
 
-# --------------------------------------------------------------------------- quarterly projection
+# --------------------------------------------------------------------------- quarterly predictions
 def _proj_row(r: dict) -> dict:
-    """One prediction row in the column layout of the quarterly projection table."""
+    """One prediction row in the column layout of the quarterly prediction table."""
+    pct = lambda v: None if v is None else round(100 * v, 2)
     return {"LAD": r["lad_name"], "LAD code": r["lad_uri"].rsplit("#", 1)[-1], "Quarter": r["period"], "Scenario": r["scenario"],
-            "Predicted BEV keepership": r.get("keepership"),
-            "Non-BEV stock remaining": r.get("non_bev_stock"),
-            "BEV share (%)": None if r.get("adoption_share") is None else round(100 * r["adoption_share"], 2),
-            "Turnover ceiling (%)": None if r.get("ceiling_share") is None else round(100 * r["ceiling_share"], 2),
-            "At ceiling": "" if r.get("at_ceiling") is None else ("yes" if r["at_ceiling"] else "no"),
-            "Private stock": r.get("private_stock")}
+            "Predicted BEV cars": r.get("keepership"),
+            "Petrol and diesel cars remaining": r.get("non_bev_stock"),
+            "BEV share (%)": pct(r.get("adoption_share")),
+            "Turnover path (%)": pct(r.get("path_share")),
+            "Fitted curve (%)": pct(r.get("fitted_share")),
+            "On turnover path": "" if r.get("on_path") is None else ("yes" if r["on_path"] else "no"),
+            "Private cars": r.get("private_stock")}
 
 
-PROJ_COLUMNS = ["LAD", "Quarter", "Predicted BEV keepership", "Non-BEV stock remaining", "BEV share (%)", "Turnover ceiling (%)", "At ceiling"]
-PROJECTION_NOTE = ("Each district follows the lower of its fitted diffusion curve and its fleet-turnover ceiling. The stock remaining is the "
-                   "district's private stock, held at its 2025 Q4 level, less the predicted battery-electric keepership. Pure petrol and "
-                   "diesel sales end in 2030 Q1 and hybrid sales in 2035 Q1.")
+PROJ_COLUMNS = ["LAD", "Quarter", "Predicted BEV cars", "Petrol and diesel cars remaining", "BEV share (%)", "Turnover path (%)", "On turnover path"]
+PROJECTION_NOTE = ("Each district follows the lower of its fitted diffusion curve and its fleet turnover path. The cars remaining are the "
+                   "district's private cars, held at their 2026 Q2 level, less the predicted battery-electric cars; hybrids are counted with "
+                   "petrol and diesel. New pure petrol and diesel car sales end in 2030 and every new car is zero emission from 2035.")
 
 
 def wants_projection_table(kg, question: str, mode: str) -> bool:
-    """A request for the quarterly projection itself (rather than a one-row-per-LAD custom dataset)."""
+    """A request for the quarterly predictions themselves (rather than a one-row-per-LAD custom dataset)."""
     if mode != "prediction":
         return False
     q = " " + question.casefold() + " "
@@ -688,7 +751,7 @@ def wants_projection_table(kg, question: str, mode: str) -> bool:
 
 
 def projection_table_answer(kg, question: str) -> dict:
-    """Quarterly projection as a table: all districts and quarters, one district, one quarter or one year."""
+    """Quarterly predictions as a table: all districts and quarters, one district, one quarter or one year."""
     scenario = extract_scenario(question)
     lads = [name for name, _ in kg.find_lads_in_text(question)]
     yq = extract_quarter(question)
@@ -715,14 +778,14 @@ def projection_table_answer(kg, question: str) -> dict:
     links = family_sources(kg, "diffusion")
     if not table:
         inv = kg.prediction_inventory()
-        md = (f"### Not found in the prediction knowledge graph\n\nThe quarterly projection covers {inv['periods'][0]} to {inv['periods'][-1]} "
+        md = (f"### Not found in the prediction knowledge graph\n\nThe quarterly predictions cover {inv['periods'][0]} to {inv['periods'][-1]} "
               f"for {len(inv['lads'])} districts; nothing matches {when or 'that request'}.\n\n**Knowledge graph:** [CLEETS]({ONTOLOGY})")
         return {"markdown": md, "kind": "prediction", "family": "diffusion", "table": None, "columns": None}
     n_lads = len({r["LAD"] for r in table if r["LAD code"] != "W92000004"})
     n_q = len({r["Quarter"] for r in table})
     scope = (", ".join(lads) if lads else f"all {n_lads} districts and Wales")
     preview = table if len(table) <= 30 else table[:24]
-    md = (f"### Quarterly projection, {scenario} scenario: {scope}, {when}\n\n"
+    md = (f"### Quarterly predictions, {scenario} scenario: {scope}, {when}\n\n"
           f"{len(table):,} rows ({n_lads} district{'s' if n_lads != 1 else ''}"
           + ("" if lads else " plus the Wales total") + f", {n_q} quarter{'s' if n_q != 1 else ''}). {PROJECTION_NOTE}\n\n"
           + md_table(preview, PROJ_COLUMNS)
@@ -738,16 +801,19 @@ def _cap(text: str) -> str:
 
 
 def _quarter_sentence(r: dict) -> str:
-    out = f"predicted private BEV keepership **{r['keepership']:,.0f}**"
+    out = f"predicted private battery-electric cars **{r['keepership']:,.0f}**"
     if r.get("adoption_share") is not None:
-        out += f" (**{r['adoption_share']:.2%}** of the private stock)"
+        out += f" (**{r['adoption_share']:.2%}** of private cars)"
     if r.get("non_bev_stock") is not None:
-        out += f"; non-BEV stock remaining **{r['non_bev_stock']:,.0f}**"
+        out += f"; petrol and diesel cars remaining **{r['non_bev_stock']:,.0f}**"
         if r.get("private_stock"):
-            out += f" of {r['private_stock']:,.0f} private vehicles"
-    if r.get("at_ceiling") is not None and r.get("ceiling_share") is not None:
-        out += (f". The trajectory is held at the fleet-turnover ceiling ({r['ceiling_share']:.2%})" if r["at_ceiling"]
-                else f". The fitted curve is below the fleet-turnover ceiling ({r['ceiling_share']:.2%}), so the ceiling does not bind")
+            out += f" of {r['private_stock']:,.0f} private cars"
+    if r.get("on_path") is not None and r.get("path_share") is not None:
+        wales = str(r.get("lad_uri", "")).endswith("W92000004")       # the Wales row is the stock-weighted sum of the districts
+        fitted = ((f"; the district fitted curves alone give {r['fitted_share']:.2%}, weighted by stock" if wales else
+                   f"; the fitted curve alone gives {r['fitted_share']:.2%}") if r.get("fitted_share") is not None else "")
+        out += (f". The prediction is the turnover path ({r['path_share']:.2%}){fitted}" if r["on_path"]
+                else f". The fitted curve is still below the turnover path ({r['path_share']:.2%}), so the prediction is the curve")
     return out + "."
 
 
@@ -758,17 +824,17 @@ def inventory_answer(kg, mode):
         fams = kg.prediction_families() if hasattr(kg, "prediction_families") else []
         fam_lines = "\n".join(
             f"- **{family_label(kg, f['key'])}**: "
-            + (f"{f['predictions']:,} LAD-quarter forecasts, scenarios {', '.join(f['scenarios'])}" if f["predictions"] else "")
+            + (f"{f['predictions']:,} LAD-quarter predictions, scenarios {', '.join(f['scenarios'])}" if f["predictions"] else "")
             + (f"{'; ' if f['predictions'] else ''}{f['resources']} per-LAD resources" if f["resources"] else "")
             + (f"{'; ' if (f['predictions'] or f['resources']) else ''}evaluation metrics only" if "metrics" in f["kinds"] and not f["predictions"] and not f["resources"] else "")
             + (f" ({f['paper']})" if f.get("paper") else "")
             for f in fams)
         return (f"### Prediction data inventory\n\n"
-                f"- **{inv['prediction_count']:,}** quarterly scenario forecasts across **{len(inv['lads'])}** Welsh LADs "
+                f"- **{inv['prediction_count']:,}** quarterly scenario predictions across **{len(inv['lads'])}** Welsh LADs "
                 f"({inv['periods'][0] if inv['periods'] else '?'} to {inv['periods'][-1] if inv['periods'] else '?'}; "
                 f"scenarios {', '.join(inv['scenarios']) or 'not stated'}).\n"
                 f"- Measures: {', '.join(inv['measures'])}.\n\n"
-                f"**Prediction types loaded (matching the paper):**\n{fam_lines}\n\n"
+                f"**Prediction types loaded:**\n{fam_lines}\n\n"
                 f"**Knowledge graph:** [CLEETS]({ONTOLOGY})")
     inv = kg.actual_inventory()
     ds = [f"[{label}]({url})" if url else label for label, _, url in inv["datasets"][:12]]
@@ -798,7 +864,7 @@ def diffusion_answer(kg, question, humanize: bool = False):
         wales = kg.area_prediction_quarter(y, qn, scenario)
         if names and not got or (not names and not wales):
             inv = kg.prediction_inventory()
-            return (f"### Not found in the prediction knowledge graph\n\nThe quarterly projection covers {inv['periods'][0]} to "
+            return (f"### Not found in the prediction knowledge graph\n\nThe quarterly predictions cover {inv['periods'][0]} to "
                     f"{inv['periods'][-1]}; {y} Q{qn} is outside it.\n\n**Knowledge graph:** [CLEETS]({ONTOLOGY})")
         if got:
             title = f"### {', '.join(n for n, _ in got)}: {y} Q{qn}, {scenario} scenario"
@@ -811,14 +877,14 @@ def diffusion_answer(kg, question, humanize: bool = False):
             rows = kg.prediction_quarter_summary(y, qn, scenario)
             if rows and rows[0].get("non_bev_stock") is not None:
                 most = max(rows, key=lambda r: r["non_bev_stock"]); least = min(rows, key=lambda r: r["non_bev_stock"])
-                body += (f" Across the {len(rows)} districts the stock remaining ranges from **{least['non_bev_stock']:,.0f}** "
+                body += (f" Across the {len(rows)} districts the petrol and diesel cars remaining range from **{least['non_bev_stock']:,.0f}** "
                          f"({least['lad_name']}) to **{most['non_bev_stock']:,.0f}** ({most['lad_name']}); "
-                         f"{sum(1 for r in rows if r.get('at_ceiling'))} districts are at their ceiling. "
+                         f"{sum(1 for r in rows if r.get('on_path'))} districts are on their turnover path. "
                          f"Ask for a table of all districts in {y} Q{qn} to see every value.")
         return (f"{title}\n\n{body}\n\n**Sources:** {md_links(links)}\n\n*This is a model prediction, not an observed value.*"
                 + _method_footer(kg, fam))
 
-    # Rankings by the stock that remains.
+    # Rankings by the petrol and diesel cars that remain.
     if stock_q and not lads and any(x in q for x in ("highest", "most", "largest", "top", "rank", "lowest", "least", "smallest", "fewest", "bottom")):
         rows = [r for r in kg.prediction_year_summary(year, scenario, family=fam) if r.get("non_bev_stock") is not None]
         if rows:
@@ -826,9 +892,9 @@ def diffusion_answer(kg, question, humanize: bool = False):
             share = "share" in q or "proportion" in q or "percent" in q or "%" in q
             key = (lambda r: 1 - r["adoption_share"]) if share else (lambda r: r["non_bev_stock"])
             rows.sort(key=key, reverse=not low)
-            body = "\n".join(f"{i+1}. **{r['lad_name']}**: {r['non_bev_stock']:,.0f} non-BEV vehicles "
-                             f"({1 - r['adoption_share']:.2%} of its private stock)" for i, r in enumerate(rows[:10]))
-            return (f"### {'Smallest' if low else 'Largest'} non-BEV stock remaining{' by share' if share else ''}: "
+            body = "\n".join(f"{i+1}. **{r['lad_name']}**: {r['non_bev_stock']:,.0f} petrol and diesel cars "
+                             f"({1 - r['adoption_share']:.2%} of its private cars)" for i, r in enumerate(rows[:10]))
+            return (f"### {'Fewest' if low else 'Most'} petrol and diesel cars remaining{' by share' if share else ''}: "
                     f"{rows[0]['period']}, {scenario} scenario\n\n{body}\n\n{PROJECTION_NOTE}\n\n**Sources:** {md_links(src)}"
                     + _method_footer(kg, fam))
 
@@ -849,7 +915,7 @@ def diffusion_answer(kg, question, humanize: bool = False):
             span = "fourth quarter of each year"
         if shown:
             table = [_proj_row(r) for r in shown]
-            return (f"### {name}: predicted keepership and stock remaining, {scenario} scenario ({span})\n\n"
+            return (f"### {name}: predicted battery-electric cars and cars remaining, {scenario} scenario ({span})\n\n"
                     + md_table(table, PROJ_COLUMNS[1:]) + f"\n\n{PROJECTION_NOTE} "
                     f"Ask for a table of {name}'s quarterly predictions to download all {len(series)} quarters.\n\n"
                     f"**Sources:** {md_links(src)}" + _method_footer(kg, fam))
@@ -861,29 +927,30 @@ def diffusion_answer(kg, question, humanize: bool = False):
             rows = kg.prediction_rows(year, sc, name, family=fam)
             if rows:
                 r = rows[-1]
-                lines.append(f"- **{sc.title()}** ({r['period']}): predicted keepership **{r['keepership']:,.0f}**, adoption share **{r['adoption_share']:.2%}**." if r['adoption_share'] is not None else f"- **{sc.title()}**: **{r['keepership']:,.0f}** predicted keepership.")
+                lines.append(f"- **{sc.title()}** ({r['period']}): **{r['keepership']:,.0f}** predicted private battery-electric cars, **{r['adoption_share']:.2%}** of private cars." if r['adoption_share'] is not None else f"- **{sc.title()}**: **{r['keepership']:,.0f}** predicted private battery-electric cars.")
         rows_c = kg.prediction_rows(year, "central", name, family=fam)
         if rows_c and "sensitiv" in q:
             lo = kg.prediction_rows(year, "low", name, family=fam); hi = kg.prediction_rows(year, "high", name, family=fam)
             if lo and hi:
                 spread = hi[-1]["keepership"] - lo[-1]["keepership"]
-                lines.append(f"\nSpread between the low and high scenarios at {rows_c[-1]['period']}: **{spread:,.0f}** vehicles "
-                             f"({spread / rows_c[-1]['keepership']:.1%} of the central value). The scenarios differ only in the median "
-                             f"scrappage age behind the fleet-turnover ceiling (16, 14 and 12 years), so the spread measures sensitivity to vehicle lifetime.")
+                lines.append(f"\nSpread between the low and high scenarios at {rows_c[-1]['period']}: **{spread:,.0f}** cars "
+                             f"({spread / rows_c[-1]['keepership']:.1%} of the central value). The low scenario cuts the 2030 level of the sales rule "
+                             f"to 50% and the high scenario uses the scrappage rates of 2014 to 2019, so the spread covers a weaker sales rule and "
+                             f"shorter-lived cars.")
         return "\n".join(lines) + f"\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam)
 
     if any(x in q for x in ("highest", "top", "rank")):
         rows = kg.prediction_year_summary(year, scenario, family=fam)
         if not rows:
             return f"No prediction observations were found for {year} under the {scenario} scenario."
-        body = "\n".join(f"{i+1}. **{r['lad_name']}** — {r['keepership']:,.0f} ({r['period']})" for i, r in enumerate(rows[:10]))
-        return (f"### Highest predicted EV keepership — {year}, {scenario} scenario\n\n{body}\n\n**Sources:** {md_links(src)}"
+        body = "\n".join(f"{i+1}. **{r['lad_name']}**: {r['keepership']:,.0f} ({r['period']})" for i, r in enumerate(rows[:10]))
+        return (f"### Most predicted private battery-electric cars: {year}, {scenario} scenario\n\n{body}\n\n**Sources:** {md_links(src)}"
                 + _method_footer(kg, fam))
 
     if any(x in q for x in ("lowest", "bottom")):
         rows = list(reversed(kg.prediction_year_summary(year, scenario, family=fam)))
-        body = "\n".join(f"{i+1}. **{r['lad_name']}** — {r['keepership']:,.0f} ({r['period']})" for i, r in enumerate(rows[:10]))
-        return (f"### Lowest predicted EV keepership — {year}, {scenario} scenario\n\n{body}\n\n**Sources:** {md_links(src)}"
+        body = "\n".join(f"{i+1}. **{r['lad_name']}**: {r['keepership']:,.0f} ({r['period']})" for i, r in enumerate(rows[:10]))
+        return (f"### Fewest predicted private battery-electric cars: {year}, {scenario} scenario\n\n{body}\n\n**Sources:** {md_links(src)}"
                 + _method_footer(kg, fam))
 
     if "milestone" in q or "when" in q or "reach" in q or "cross" in q:
@@ -900,19 +967,19 @@ def diffusion_answer(kg, question, humanize: bool = False):
         if rows:
             r = rows[-1]
             links = kg.source_links_for_subject(r["subject"], prediction=True) or src
-            share = f"; predicted adoption share **{r['adoption_share']:.2%}**" if r["adoption_share"] is not None else ""
-            body = (f"Under the **{scenario}** scenario, the latest {year} quarterly prediction ({r['period']}) gives predicted private BEV keepership of **{r['keepership']:,.0f}**{share}.")
+            share = f", **{r['adoption_share']:.2%}** of private cars" if r["adoption_share"] is not None else ""
+            body = (f"Under the **{scenario}** scenario, the latest {year} quarterly prediction ({r['period']}) gives **{r['keepership']:,.0f}** private battery-electric cars{share}.")
             if r.get("non_bev_stock") is not None:
-                body += (f" The non-BEV stock remaining is **{r['non_bev_stock']:,.0f}** vehicles"
-                         + (f" of {r['private_stock']:,.0f}" if r.get("private_stock") else "")
-                         + (", with the trajectory held at the fleet-turnover ceiling." if r.get("at_ceiling") else "."))
+                body += (f" The petrol and diesel cars remaining number **{r['non_bev_stock']:,.0f}**"
+                         + (f" of {r['private_stock']:,.0f} private cars" if r.get("private_stock") else "")
+                         + (", and the prediction is the district's turnover path." if r.get("on_path") else "."))
             if len(lads) > 1:
                 other = kg.prediction_rows(year, scenario, lads[1][0], family=fam)
                 if other:
                     o = other[-1]
                     body += (f" For **{lads[1][0]}** the same quarter gives **{o['keepership']:,.0f}** ({o['adoption_share']:.2%}). "
-                             f"The counts differ because each share is multiplied by the LAD's own private vehicle stock, and each LAD has its "
-                             f"own fitted curve and its own fleet-turnover ceiling.")
+                             f"The counts differ because each share is multiplied by the district's own private car stock, and each district has "
+                             f"its own fitted curve and its own turnover path.")
             if humanize:
                 body = humanize_answer(body, metadata={"subject": name, "value": f"{r['keepership']:,.0f}", "period": r['period'], "scenario": scenario})
             return (f"### {name} prediction\n\n{body}\n\n**Sources:** {md_links(links)}\n\n"
@@ -924,10 +991,10 @@ def diffusion_answer(kg, question, humanize: bool = False):
         used = " · ".join(f"[{l['label']}]({l['url']})" for l in act.get("used", [])) if act else ""
         cite = (kg.family("diffusion") or {}).get("citation", "") if hasattr(kg, "family") else ""
         return ("### Prediction provenance\n\n"
-                + (f"The diffusion forecasts were generated by the activity **{act['label']}** ({act['ended'][:10]}). {act['comment']}\n\n"
+                + (f"The quarterly predictions were generated by the activity **{act['label']}** ({act['ended'][:10]}). {act['comment']}\n\n"
                    f"Source datasets: {used}.\n\n" if act else "")
                 + (f"Citation: {cite}\n\n" if cite else "")
-                + "Every forecast resource in the KG links to this activity with `prov:wasGeneratedBy` and to its source datasets with "
+                + "Every prediction in the KG links to this activity with `prov:wasGeneratedBy` and to its source datasets with "
                   "`dcterms:source`; ask about a specific LAD, year and scenario to retrieve one. Values are model predictions, not observations.\n\n"
                 + f"**Knowledge graph:** [CLEETS]({ONTOLOGY})" + _method_footer(kg, fam))
 
@@ -935,21 +1002,21 @@ def diffusion_answer(kg, question, humanize: bool = False):
     if rows:
         avg = sum(r["keepership"] for r in rows if r["keepership"] is not None) / len(rows)
         wales = kg.area_prediction_rows(year, scenario) if hasattr(kg, "area_prediction_rows") else []
-        body = (f"I found {len(rows)} LAD-level year-end records. Mean predicted private BEV keepership is **{avg:,.0f}** per LAD; "
+        body = (f"I found {len(rows)} LAD-level year-end records. The mean is **{avg:,.0f}** predicted private battery-electric cars per LAD; "
                 f"the highest is **{rows[0]['lad_name']} ({rows[0]['keepership']:,.0f})** and the lowest **{rows[-1]['lad_name']} ({rows[-1]['keepership']:,.0f})**.")
         if wales:
             w = wales[-1]
-            body += f" The Wales-wide total at {w['period']} is **{w['keepership']:,.0f}** private BEVs ({w['adoption_share']:.1%} of the private stock)."
+            body += f" The Wales-wide total at {w['period']} is **{w['keepership']:,.0f}** private battery-electric cars ({w['adoption_share']:.1%} of private cars)."
             if w.get("non_bev_stock") is not None:
-                body += f" The non-BEV stock remaining in Wales is **{w['non_bev_stock']:,.0f}** vehicles."
+                body += f" Petrol and diesel cars remaining in Wales: **{w['non_bev_stock']:,.0f}**."
         if humanize:
             body = humanize_answer(body, metadata={"count": len(rows), "mean_keepership": f"{avg:,.0f}", "year": year, "scenario": scenario})
-        return (f"### Wales prediction summary — {year}, {scenario} scenario\n\n{body}\n\n**Sources:** {md_links(src)}"
+        return (f"### Wales prediction summary: {year}, {scenario} scenario\n\n{body}\n\n**Sources:** {md_links(src)}"
                 + _method_footer(kg, fam))
 
     return ("### Not found in the prediction knowledge graph\n\nNo prediction resource in the loaded graph matches that question "
             f"(year {year}, {scenario} scenario), and CLEETS-CHAT does not infer an unsupported answer. Name a district, a year "
-            "within the forecast horizon, a scenario, a ranking or a provenance request (the ⓘ button lists example "
+            "within the prediction horizon, a scenario, a ranking or a provenance request (the ⓘ button lists example "
             f"questions).\n\n**Knowledge graph:** [CLEETS]({ONTOLOGY})")
 
 
@@ -958,7 +1025,7 @@ def hierarchical_answer(kg, question, humanize: bool = False):
     rows = kg.hierarchical_params()
     if not rows:
         return ("### Hierarchical diffusion\n\nThe hierarchical-diffusion parameters are not in the loaded KG. Run "
-                "`python build_prediction_families.py --notebook <companion notebook>` and restart." + _method_footer(kg, fam))
+                "`python tools/update_prediction_families.py` and restart." + _method_footer(kg, fam))
     q = question.casefold()
     lads = kg.find_lads_in_text(question)
     src = family_sources(kg, fam)
@@ -970,7 +1037,7 @@ def hierarchical_answer(kg, question, humanize: bool = False):
                 parts.append(f"**{name}** diffuses with midpoint **{r['midpoint_period']}** (rank {int(r['slowest_rank'])} of {len(rows)}, slowest first), "
                              f"{r['lag_vs_median_years']:+.2f} years against the Welsh median, rate **{r['rate_per_quarter']:.3f}** per quarter, "
                              f"95% interval width {r['ci_width_years']:.2f} years, shrinkage weight {r['shrinkage_weight']:.3f}.")
-        body = " ".join(parts)
+        body = " ".join(parts) + " These midpoints describe the fitted curves before the turnover path is applied; the capped predictions reach 50% later."
         if humanize:
             body = humanize_answer(body, metadata={"model": "hierarchical diffusion"})
         return f"### {', '.join(n for n, _ in lads[:3])}: hierarchical diffusion parameters\n\n{body}\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam)
@@ -993,40 +1060,56 @@ def turnover_answer(kg, question, humanize: bool = False):
     fam = "turnover"
     rows = kg.turnover_rows()
     if not rows:
-        return ("### Age-structured turnover\n\nThe turnover trajectories are not in the loaded KG. Run "
-                "`python build_prediction_families.py --notebook <companion notebook>` and restart." + _method_footer(kg, fam))
+        return ("### Fleet turnover path\n\nThe turnover results are not in the loaded KG. Run "
+                "`python tools/update_prediction_families.py` and restart." + _method_footer(kg, fam))
     q = question.casefold()
     lads = kg.find_lads_in_text(question)
     src = family_sources(kg, fam)
     ceilings = kg.turnover_ceilings()
+    paths = [c for c in ceilings if c.get("model") == "turnover path"]
+    weib = [c for c in ceilings if c.get("model") == "Weibull ceiling"]
+    note = "*A path, not a ceiling: an estimate of what the sales rule delivers given observed scrappage and second-hand entry.*"
+    pct = lambda v: "n/a" if v is None else f"{v:.1%}"
     if lads:
         parts = []
         for name, _ in lads[:3]:
             r = next((x for x in rows if x["lad_name"] == name), None)
             if r:
-                parts.append(f"**{name}**: under the 2032 phase-out with a 14-year median scrappage age, BEV share of the private parc reaches "
-                             f"**{r['bev_share_2045']:.1%}** at 2045 Q4 and **{r['bev_share_end']:.2%}** at 2053 Q4, leaving about **{r['residual_non_bev']:,.0f}** "
-                             f"non-BEV vehicles at 2053 Q4; 95% is first reached in **{r.get('reaches_0.95', 'n/a')}**, 99% in **{r.get('reaches_0.99', 'n/a')}** "
-                             f"and 99.5% in **{r.get('reaches_0.995', 'n/a')}** (arrival rank {int(r['arrival_rank'])} of {len(rows)}).")
+                parts.append(
+                    f"**{name}**: {_fmt(r.get('private_cars'))} private cars at 2026 Q2, of which {_fmt(r.get('bev_cars_start'))} battery electric "
+                    f"({pct(r.get('bev_share_start'))}); mean age {_fmt(r.get('mean_age_years'), digits=1)} years, {pct(r.get('share_aged_15_plus'))} aged 15 or "
+                    f"more; {pct(r.get('first_year_entry_share'))} of the cars entering private keepership are in their first year. On the central turnover "
+                    f"path the battery-electric share is {pct(r.get('bev_share_2030'))} at 2030 Q1, {pct(r.get('bev_share_2035'))} at 2035 Q1, "
+                    f"{pct(r.get('bev_share_2040'))} at 2040 Q4, **{pct(r.get('bev_share_2045'))}** at 2045 Q4 and {pct(r.get('bev_share_end'))} at 2053 Q4, "
+                    f"with about **{_fmt(r.get('residual_non_bev'))}** petrol and diesel cars left at 2045 Q4. It first reaches 50% in "
+                    f"**{str(r.get('reaches_0.5', 'n/a')).replace('-Q', ' Q')}** and 90% in "
+                    f"{str(r.get('reaches_0.9', 'no quarter before 2054')).replace('-Q', ' Q')} "
+                    f"(rank {int(r['arrival_rank'])} of {len(rows)} by the 50% quarter).")
         body = " ".join(parts)
         if humanize:
-            body = humanize_answer(body, metadata={"model": "age-structured turnover"})
-        return (f"### {', '.join(n for n, _ in lads[:3])}: age-structured turnover trajectory\n\n{body}\n\n"
-                f"*A ceiling, not a forecast: every new private vehicle from the ban onward is assumed to be a BEV.*\n\n**Sources:** {md_links(src)}"
+            body = humanize_answer(body, metadata={"model": "fleet turnover path"})
+        return (f"### {', '.join(n for n, _ in lads[:3])}: fleet turnover path\n\n{body}\n\n{note}\n\n**Sources:** {md_links(src)}"
                 + _method_footer(kg, fam))
-    if "ceiling" in q or "scrappage" in q or "wales" in q or "sensitiv" in q:
-        body = md_table([{"Median scrappage age (years)": c["median_scrappage_years"], "Implied annual replacement (%)": c["implied_annual_replacement_pct"],
-                          "Wales BEV share 2045 Q4": f"{c['bev_share_2045']:.2%}", "Residual non-BEV vehicles": c["residual_non_bev"]} for c in ceilings]) if ceilings else "_no ceilings loaded_"
-        return (f"### Wales fleet-turnover ceiling at 2045 Q4 under a 2032 Q4 phase-out\n\n{body}\n\n"
-                f"The scrappage curve, not the ban date, controls the 2045 outcome: moving the ban by two years shifts the residual by a few tenths "
-                f"of a point; moving the median scrappage age by two years shifts it by several points.\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam))
-    ordered = sorted(rows, key=lambda r: -(r["residual_non_bev"] or 0)) if "residual" in q else rows
-    body = md_table([{"Arrival rank": int(r["arrival_rank"]), "LAD": r["lad_name"], "BEV share 2045 Q4": f"{r['bev_share_2045']:.2%}",
-                      "BEV share 2053 Q4": f"{r['bev_share_end']:.2%}", "Residual non-BEV": r["residual_non_bev"],
-                      "Reaches 95%": r.get("reaches_0.95", ""), "Reaches 99%": r.get("reaches_0.99", "")} for r in ordered], max_rows=22)
-    note = ("After the ban every LAD receives the same inflow, so arrival quarters converge; the residual non-BEV stock separates the LADs far more "
-            "sharply than the BEV share does.")
-    return f"### Electrification arrival by LAD (2032 phase-out, median scrappage 14 years)\n\n{body}\n\n{note}\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam)
+    if any(w in q for w in ("ceiling", "weibull", "scrappage", "wales", "sensitiv", "lifetime", "how long")):
+        t1 = md_table([{"Scrappage rates of": c["scrappage_period"], "Median life (years)": c["median_scrappage_years"],
+                        "Cars entering a year (% of stock)": c["implied_annual_replacement_pct"], "Wales BEV share 2045 Q4": f"{c['bev_share_2045']:.2%}",
+                        "Petrol and diesel cars left": c["residual_non_bev"]} for c in paths]) if paths else "_no path results loaded_"
+        t2 = ("\n\nWeibull ceiling (assumed median life, every scrapped car replaced by a new one), for comparison:\n\n" + md_table(
+            [{"Median life (years)": c["median_scrappage_years"], "Implied annual replacement (%)": c["implied_annual_replacement_pct"],
+              "Wales BEV share 2045 Q4": f"{c['bev_share_2045']:.2%}"} for c in weib])) if weib else ""
+        return (f"### Wales turnover path at 2045 Q4, by scrappage period\n\n{t1}{t2}\n\n"
+                f"How long cars last moves the 2045 outcome by several points: the path uses the scrappage rates observed between year ends, and the "
+                f"Weibull ceiling assumes a median life.\n\n{note}\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam))
+    by_age = any(w in q for w in ("age", "old", "second-hand", "second hand", "used"))
+    ordered = sorted(rows, key=lambda r: -(r.get("mean_age_years") or 0)) if by_age else (
+        sorted(rows, key=lambda r: -(r["residual_non_bev"] or 0)) if ("residual" in q or "remain" in q) else rows)
+    body = md_table([{"Rank (50%)": int(r["arrival_rank"]), "LAD": r["lad_name"], "Reaches 50%": r.get("reaches_0.5", ""),
+                      "BEV share 2045 Q4": f"{r['bev_share_2045']:.2%}", "Petrol and diesel cars 2045 Q4": r["residual_non_bev"],
+                      "Mean age of cars (years)": r.get("mean_age_years"), "First-year entries": pct(r.get("first_year_entry_share"))}
+                     for r in ordered], max_rows=22)
+    tail = ("Districts differ in level as well as in timing, and the order follows the age of their cars: where keepers buy older cars, each "
+            "vintage arrives later.")
+    return f"### Fleet turnover path by district (central scenario)\n\n{body}\n\n{tail}\n\n{note}\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam)
 
 
 def charging_answer(kg, question, humanize: bool = False):
@@ -1058,34 +1141,20 @@ def charging_answer(kg, question, humanize: bool = False):
 def neural_answer(kg, question, humanize: bool = False):
     fam = "neural"
     src = family_sources(kg, fam)
-    q = question.casefold()
-    lads = kg.find_lads_in_text(question)
-    year = extract_year(question, default=2030)
-    if lads:
-        rows = kg.prediction_rows(year, "nn-stage6e", lads[0][0], family=fam)
-        if rows:
-            r = rows[-1]
-            return (f"### {lads[0][0]}: neural adoption-ratio forecast\n\nThe Stage 6e network gives a predicted private adoption ratio of "
-                    f"**{r['adoption_share']:.2%}** at {r['period']}.\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam))
-    m7 = [m for m in kg.model_metrics(fam) if "Table 7" in m.get("note", "")]
-    m6 = [m for m in kg.model_metrics(fam) if "Stage 6e" in m.get("note", "")]
-    if not (m7 or m6):
-        return ("### Neural forecasts\n\nNo neural-network results are in the loaded KG. Run `python build_prediction_families.py` with the companion "
-                "notebook (metrics) or its CSV exports (per-LAD forecasts to 2030 Q4)." + _method_footer(kg, fam))
-    parts = ["### Scenario-constrained neural and graph neural forecasts"]
-    if m7:
-        parts.append(f"Table 7, best configuration per approach ({_protocol_label(m7)}):\n\n" + md_table(_metric_table(m7, with_target=True)))
-        best = _best_line(kg)
-        if best:
-            parts.append(best + " Ask *which model is most accurate for chargers (or keepership)?* for the ranking and its reading.")
-    if m6:
-        parts.append("Stage 6e quarterly adoption-ratio network, walk-forward on first differences (percentage points):\n\n" + md_table(
-            [{"Model": m["model"], "MAE (pp)": m["mae"], "RMSE (pp)": m["rmse"], "R2 diff": m["r2"]} for m in m6]))
-    fam_d = kg.family(fam) or {}
-    parts.append("Per-LAD quarterly neural forecasts to 2030 Q4 are loaded; ask about a LAD to retrieve one." if fam_d.get("predictions")
-                 else "No per-LAD network forecast is in the loaded KG: the quarterly notebook evaluates the networks (Stages 13-14) but "
-                      "does not roll them forward, so the 2045 scenarios come from the bounded logistic. The metrics above are the "
-                      "paper's evaluation results.")
+    rows = next(iter((kg.model_ranking() if hasattr(kg, "model_ranking") else {}).values()), [])
+    if not rows:
+        return ("### Neural predictions\n\nNo model-comparison results are in the loaded KG. Run `python tools/update_prediction_families.py`."
+                + _method_footer(kg, fam))
+    parts = ["### Turnover-constrained neural and graph neural predictions",
+             f"Model comparison ({_protocol_label(rows)}; MAE and RMSE in cars):\n\n" + md_table(_metric_table(rows, rank=True))]
+    best = _best_line(kg)
+    if best:
+        parts.append(best + " Ask *which model is most accurate?* for the ranking and its reading.")
+    h = _horizon_line(kg)
+    if h:
+        parts.append(h)
+    parts.append("The networks are evaluated only: no network prediction to 2045 is in the loaded KG, and the quarterly predictions come from the "
+                 "bounded logistic capped by the turnover path.")
     return "\n\n".join(parts) + f"\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam)
 
 
@@ -1108,50 +1177,42 @@ def wants_accuracy(question: str) -> bool:
 
 
 def accuracy_answer(kg, question, humanize: bool = False):
-    """Rank the forecasting approaches by their backtest error (Table 7 + Stage 13) for one or both targets."""
+    """Rank the models of the paper's comparison by their backtest error."""
     fam = "neural"
-    target = _target_key(question)
-    ranking = kg.model_ranking(target) if hasattr(kg, "model_ranking") else {}
+    ranking = kg.model_ranking() if hasattr(kg, "model_ranking") else {}
     if not ranking:
-        return ("### Model accuracy\n\nNo comparable backtest metrics are in the loaded KG. Run `python build_prediction_families.py` "
-                "with the executed companion notebook (Stages 13-14 print Table 7)." + _method_footer(kg, fam))
+        return ("### Model accuracy\n\nNo comparable backtest metrics are in the loaded KG. Run `python tools/update_prediction_families.py`."
+                + _method_footer(kg, fam))
     src = list(family_sources(kg, "neural"))
     for l in family_sources(kg, "diffusion"):
         if l not in src:
             src.append(l)
     first = next(iter(ranking.values()))
-    parts = [f"### Which model predicts {' and '.join(ranking)} most accurately?",
-             f"All approaches are scored under one protocol ({_protocol_label(first)}; paper Table 7, notebook Stage 14; "
-             "the bounded logistic row is the Stage 13 re-run off the released KG). Ranked by MAE:"]
+    parts = [f"### Which model predicts {' and '.join(t[:1].lower() + t[1:] for t in ranking)} most accurately?",
+             f"All models are scored under one protocol ({_protocol_label(first)}). Ranked by MAE, in cars:"]
     for t, rows in ranking.items():
-        parts.append(f"**{t}**\n\n" + md_table(_metric_table(rows, rank=True)))
+        parts.append(md_table(_metric_table(rows, rank=True)))
         b = rows[0]
         runner = rows[1] if len(rows) > 1 else None
         logi = next((r for r in rows if r["model"].lower().startswith("bounded logistic")), None)
-        line = f"Lowest MAE for {t}: **{b['model']}** ({_fmt(b['mae'])})"
+        line = f"Lowest MAE one quarter ahead: **{b['model']}** ({_fmt(b['mae'])})"
         if runner:
-            line += f", then {runner['model']} ({_fmt(runner['mae'])}"
-            if runner["rmse"] is not None and b["rmse"] is not None and runner["rmse"] < b["rmse"]:
-                line += f"; lowest RMSE, {_fmt(runner['rmse'])}"
-            line += ")"
+            line += f", then {runner['model']} ({_fmt(runner['mae'])})"
         if logi is not None and logi is not b and logi is not runner:
-            line += f"; the bounded logistic, the instrument behind the 2045 scenarios, scores {_fmt(logi['mae'])}"
+            line += f"; the bounded logistic, the curve that the turnover path caps, scores {_fmt(logi['mae'])}"
         parts.append(line + ".")
-    s13 = kg.logistic_backtest(target) if hasattr(kg, "logistic_backtest") else {}
-    if s13:
-        rows = [r for rs in s13.values() for r in rs]
-        parts.append("Bounded logistic by capacity multiplier (Stage 13; alpha = 6 low, 10 central, 15 high, K = alpha x last "
-                     "training observation):\n\n" + md_table(_metric_table(rows, with_target=len(s13) > 1)))
-    parts.append("**How to read the ranking.** Persistence + drift (last value plus the mean quarterly change over the preceding "
-                 "four quarters) is the strongest one-quarter-ahead predictor, and the scenario-constrained network is the best "
-                 "neural model; both track the next quarter closely. Neither can carry a scenario, saturate, or hold up over "
-                 "multi-quarter horizons, which is why the paper keeps the bounded logistic as the forecasting instrument for the "
-                 "2045 scenarios. The scenario multiplier alpha scales a per-LAD constant that input standardisation removes, so the "
-                 "scenario-constrained NN returns identical metrics under every scenario ('any'). Mean R2 averages per-LAD R2 over "
-                 "each district's held-out quarters; pooled R2 is computed over all held-out LAD-quarters.")
-    if target == "chargers" or target is None:
-        parts.append("Note: the loaded KG holds no charger forecast to 2045. Charging enters the 2045 outlook through the "
-                     "charging-constraint assessment (Stage 8), which grows each LAD's latest EVCI9001 count at 0, 5 or 12% a year.")
+    h = _horizon_line(kg)
+    if h:
+        parts.append(h)
+    parts.append("**How to read the ranking.** Persistence with drift (last value plus the mean quarterly change over the preceding four quarters) is "
+                 "the strongest predictor one quarter ahead, and the turnover-constrained network is close to it. Neither can carry a scenario or "
+                 "saturate, and both fall behind beyond one quarter. What separates the networks is the turnover constraint and not the architecture: "
+                 "the unconstrained network fails, and the similarity graph does not help. Mean R2 averages per-district R2 over each district's "
+                 "held-out quarters; pooled R2 is computed over all held-out district-quarters. No horizon the panel can test validates a 20-year "
+                 "prediction.")
+    if _target_key(question) == "chargers":
+        parts.append("Note: charger counts are not predicted. Public charging devices are held in the graph as observations (EVCI9001) and enter "
+                     "the provision ratios only.")
     return "\n\n".join(parts) + f"\n\n**Sources:** {md_links(src)}" + _method_footer(kg, fam)
 
 
@@ -1268,7 +1329,8 @@ def actual_answer(kg, question, humanize: bool = False):
     q = question.casefold()
     if "ontology" in q or "what is cleets" in q or (q.startswith("what is") and "knowledge graph" in q):
         return (f"### CLEETS knowledge graph\n\nCLEETS is the knowledge graph that describes the 22 Welsh LADs, their observations (EV keepership, public charging, "
-                f"population, density, income deprivation) and the predictions built on them, with the source dataset behind every value. "
+                f"private cars and private battery-electric cars, population, density, income deprivation) and the predictions built on them, with the "
+                f"source dataset behind every value. "
                 f"Ask *What classes and properties are defined in CLEETS?* for its vocabulary.\n\n**Knowledge graph:** [Open CLEETS]({ONTOLOGY})")
 
     rows = list(kg.actual_search(question, limit=30))

@@ -39,7 +39,7 @@ OUT_OF_SCOPE = [
     ("How much does an EV charger cost in Swansea?", "actual", "topic", "prices, costs, incentives"),
     ("How many electric buses does Cardiff have?", "actual", "topic", "privately kept road vehicles"),
     ("What are the CO2 emissions of EVs in Cardiff?", "prediction", "topic", "Emissions, air quality"),
-    ("How many petrol cars are in Cardiff?", "actual", "topic", "petrol, diesel, hybrid"),
+    ("How many petrol cars are in Cardiff?", "actual", "topic", "Petrol, diesel and hydrogen vehicles are not held separately"),
     ("Where is the nearest charger to Cardiff Central station?", "actual", "topic", "finest geography"),
     ("How far is Cardiff from Swansea?", "actual", "topic", "Distances, journeys"),
     ("What is the unemployment rate in Powys?", "actual", "topic", "labour-market"),
