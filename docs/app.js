@@ -110,7 +110,7 @@ function drawMetric(key) {
 function onLadClick(lad) {
   toggleLad(lad);
   $("question").value = state.mode === "prediction"
-    ? `What is ${lad}'s predicted EV keepership in ${state.meta.forecast_year} under the central scenario?`
+    ? `How many private battery-electric cars are predicted for ${lad} in ${state.meta.forecast_year} under the central scenario?`
     : `What do you know about ${lad}?`;
 }
 
@@ -131,7 +131,7 @@ function renderChips() {
   const c = state.meta.counts;
   $("chips").innerHTML = [
     chip("Welsh LADs", c.lads), chip("Observed triples", c.observed_triples.toLocaleString("en-GB")),
-    chip("Observations", c.observations.toLocaleString("en-GB")), chip("Quarterly forecasts", c.forecasts.toLocaleString("en-GB")),
+    chip("Observations", c.observations.toLocaleString("en-GB")), chip("Quarterly predictions", c.forecasts.toLocaleString("en-GB")),
     chip("Prediction types", c.families), chip("Scenarios", c.scenarios.join(" / ")), chip("Horizon", `${c.years[0]}–${c.years[1]}`),
     `<span class="chip" id="chip-runtime"><span style="opacity:.85">Runtime </span><b>loading…</b></span>`,
   ].join("");

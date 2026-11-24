@@ -11,7 +11,7 @@ stays correct when a dataset or a prediction type is added.
 from __future__ import annotations
 
 ONTOLOGY_URL = "https://w3id.org/def/cleets"
-PAPER_TITLE = "Predicting EV adoption in Wales using Semantic Knowledge Graph"
+PAPER_TITLE = "Predicting electric vehicle adoption in Wales from open data integrated in semantic knowledge graphs"
 
 ROLE_LABELS = {
     "source": "Source dataset",
@@ -44,7 +44,7 @@ def about_content(kg) -> dict:
     horizon = pred.get("years", (None, None))
 
     facts = {
-        "lads": len(kg.lad_names()), "observations": n_obs, "measures": len(measures),
+        "lads": len(kg.lad_names()), "observations": n_obs, "measures": len(measures), "cube_observations": inv.get("cube_observations", 0),
         "observed_triples": inv["triples"], "sources": len(sources), "forecasts": pred["prediction_count"],
         "families": len(fams), "years": years, "horizon": horizon,
     }
@@ -53,8 +53,10 @@ def about_content(kg) -> dict:
         "CLEETS-CHAT is a question-answering assistant for electric-vehicle (EV) adoption in Wales. It answers free-text "
         "questions from two knowledge graphs rather than from a language model's memory: the observed graph CLEETS-KG-Enriched "
         f"({facts['observations']:,} observations of {facts['measures']} measures for the {facts['lads']} Welsh local authority "
-        f"districts, {years}) and the CLEETS Prediction KG ({facts['forecasts']:,} quarterly scenario forecasts to "
-        f"{horizon[1] if horizon and horizon[1] else 2045} and the {facts['families']} prediction types of the companion paper). "
+        f"districts, {years}"
+        + (f", and {facts['cube_observations']:,} observations of two cohort tables of licensed cars" if facts["cube_observations"] else "")
+        + f") and the CLEETS Prediction KG ({facts['forecasts']:,} quarterly scenario predictions of private battery-electric cars to "
+        f"{horizon[1] if horizon and horizon[1] else 2045} and {facts['families']} prediction types). "
         "Every answer is assembled from retrieved statements or from calculations the system performs on them, names the dataset "
         "behind each value, states whether a value is observed, calculated or predicted, and explains how each prediction was "
         "generated. Stakeholders can extract custom district tables, plot them on the map, download them as CSV and score every answer."
@@ -70,8 +72,11 @@ def about_content(kg) -> dict:
     )
 
     datasets_intro = (
-        f"The observed graph currently integrates {facts['sources']} open datasets under the Open Government Licence, all at "
-        "local-authority level, listed below with the measures each one supplies (read from the dataset records in the graph)."
+        f"The observed graph currently integrates {facts['sources']} source tables published under the Open Government Licence, listed "
+        "below with the measures each one supplies, the number of observations and the period covered (read from the dataset records "
+        "in the graph). Most are held by local authority district and quarter or year. The two cohort tables (VEH9901 and VEH1111) are "
+        "held as RDF Data Cube observations by year of first registration and include national rows; they supply the starting stock, "
+        "the scrappage rates and the second-hand entry of the fleet turnover model. The paper counts the two WIMD 2025 tables as one dataset."
     )
 
     scale = (
@@ -85,7 +90,8 @@ def about_content(kg) -> dict:
     )
 
     paper = (f"Companion paper: {PAPER_TITLE} (CLEETS, Cardiff University, 2026). Data set: CLEETS-KG v1.3.0 "
-             f"(CC BY 4.0), knowledge graph and ontology at {ONTOLOGY_URL}.")
+             f"(CC BY 4.0), knowledge graph and ontology at {ONTOLOGY_URL}; the tables added since that release are loaded from "
+             "supplement graphs in the data folder of the repository.")
 
     rows = []
     for d in cat:
