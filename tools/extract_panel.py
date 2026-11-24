@@ -1,11 +1,15 @@
-"""Extract the quarterly district panel from CLEETS-KG (v1.3.0 vocabulary).
+"""Extract the quarterly district panel from CLEETS-KG (v1.3.0 vocabulary) and its car supplement.
 
 One row per Welsh local authority district and quarter. Columns:
   lad_code, lad_name, year, quarter, period,
   ev_keepership        private battery-electric keepership (VEH0132)
   ev_chargers          public charging devices (EVCI9001), from 2019-Q4
   private_stock        licensed private vehicles, all body types, all fuels (VEH0105)
+  private_hybrid_stock licensed private petrol hybrid vehicles, all body types (VEH0105)
   adoption_share       ev_keepership / private_stock
+  private_cars         licensed private cars, all fuels (VEH0105)
+  bev_cars             licensed private battery-electric cars (VEH0142)
+  car_adoption_share   bev_cars / private_cars, the adoption share used by the prediction models
   evs_per_1000         derived in the graph
   chargers_per_100k    derived in the graph
   keepers_per_charger  derived in the graph (AdoptionRatioObservation)
@@ -14,6 +18,7 @@ One row per Welsh local authority district and quarter. Columns:
   income_deprivation_decile  mean WIMD 2025 income-domain decile (1 = most deprived)
 """
 import sys
+from pathlib import Path
 import pandas as pd
 from rdflib import Graph
 
@@ -22,6 +27,9 @@ out = sys.argv[2] if len(sys.argv) > 2 else "data/cleets_lad_quarter_panel.csv"
 
 g = Graph()
 g.parse(src, format="turtle")
+supplement = Path(src).with_name("cleets_private_cars.ttl")     # car series added since the v1.3.0 release
+assert supplement.exists(), "run tools/build_observed_supplements.py first"
+g.parse(supplement, format="turtle")
 print(f"Graph loaded: {len(g):,} triples")
 
 PREFIX = """
@@ -62,6 +70,9 @@ SELECT ?code ?year ?quarter ?value WHERE {{
   ?t cleets:year ?year ; cleets:quarter ?quarter . }}""").rename(columns={"value": col})
 
 stock = generic("PrivateVehicleStockProperty", "private_stock")
+hybrid = generic("PrivateHybridStockProperty", "private_hybrid_stock")
+cars = generic("PrivateCarStockProperty", "private_cars")
+bev_cars = generic("PrivateBatteryElectricCarsProperty", "bev_cars")
 per1000 = generic("EVsPerThousandResidentsProperty", "evs_per_1000")
 per100k = generic("ChargersPer100kResidentsProperty", "chargers_per_100k")
 
@@ -92,7 +103,7 @@ SELECT ?code ?value WHERE {
 
 key = ["code", "year", "quarter"]
 panel = keep
-for d in (chg, stock, per1000, per100k, ratio):
+for d in (chg, stock, hybrid, cars, bev_cars, per1000, per100k, ratio):
     panel = panel.merge(d, on=key, how="outer")
 for c in ["year", "quarter"]:
     panel[c] = panel[c].astype(int)
@@ -106,9 +117,10 @@ panel = panel.merge(dep, on="code", how="left")
 panel = panel.merge(lads[["code", "name"]], on="code", how="left").rename(columns={"code": "lad_code", "name": "lad_name"})
 panel["period"] = panel["year"].astype(str) + "Q" + panel["quarter"].astype(str)
 panel["adoption_share"] = panel["ev_keepership"] / panel["private_stock"]
+panel["car_adoption_share"] = panel["bev_cars"] / panel["private_cars"]
 
-cols = ["lad_code", "lad_name", "year", "quarter", "period", "ev_keepership", "ev_chargers", "private_stock",
-        "adoption_share", "evs_per_1000", "chargers_per_100k", "keepers_per_charger",
+cols = ["lad_code", "lad_name", "year", "quarter", "period", "ev_keepership", "ev_chargers", "private_stock", "private_hybrid_stock",
+        "adoption_share", "private_cars", "bev_cars", "car_adoption_share", "evs_per_1000", "chargers_per_100k", "keepers_per_charger",
         "population", "density", "income_deprivation_decile"]
 panel = panel[cols].sort_values(["lad_name", "year", "quarter"]).reset_index(drop=True)
 panel.to_csv(out, index=False)

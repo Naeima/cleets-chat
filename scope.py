@@ -236,9 +236,10 @@ UNMODELLED_TOPICS: List[Tuple[str, Tuple[str, ...], str]] = [
      ("petrol", "gasoline", "diesel", "hybrid", "hybrids", "phev", "phevs", "plug-in hybrid", "plug-in hybrids",
       "plugin hybrid", "hydrogen", "fuel cell", "fuel cells", "lpg", "cng", "biofuel", "biofuels", "internal combustion",
       "combustion", "fuel", "fuels", "fossil"),
-     "The graphs hold private battery-electric keepership (VEH0132) and the total private vehicle stock (VEH0105); "
-     "petrol, diesel, hybrid and hydrogen vehicles are not held separately and appear only as the non-BEV remainder "
-     "(and as the residual non-BEV stock of the turnover scenario)."),
+     "The graphs hold private battery-electric cars (VEH0142), private battery-electric vehicles of all body types (VEH0132), "
+     "private cars and private vehicles of all fuels and private petrol hybrid vehicles (VEH0105). Petrol, diesel and "
+     "hydrogen vehicles are not held separately: petrol and diesel cars appear only as the cars that remain in the "
+     "predictions (hybrids included) and, in the cohort tables, grouped with every fuel other than battery electric."),
     ("Transport modes and fleets other than privately kept vehicles",
      ("bus", "buses", "coach", "coaches", "train", "trains", "rail", "railway", "railways", "tram", "trams", "metro",
       "taxi", "taxis", "cab", "cabs", "uber", "e-scooter", "e-scooters", "scooter", "scooters", "bike", "bikes",
@@ -247,7 +248,7 @@ UNMODELLED_TOPICS: List[Tuple[str, Tuple[str, ...], str]] = [
       "haulage", "company car", "company cars", "company fleet", "company fleets", "company-kept", "business fleet",
       "business fleets", "fleet operator", "fleet operators", "car club", "car clubs", "car sharing", "ride hailing",
       "public transport", "aviation", "flights", "ferry", "ferries", "shipping"),
-     "Only privately kept road vehicles are modelled (the private keepership extracts of VEH0132 and VEH0105); "
+     "Only privately kept road vehicles are modelled (the private keepership extracts of VEH0105, VEH0132 and VEH0142); "
      "buses, rail, taxis, two-wheelers, HGVs and company-kept fleets are outside the graphs."),
     ("Locations finer than a local authority district",
      ("postcode", "postcodes", "street", "streets", "car park", "car parks", "parking", "station", "stations",
@@ -557,7 +558,7 @@ def _examples(kg, mode: str, lad: Optional[str] = None) -> List[str]:
     names = kg.lad_names() if hasattr(kg, "lad_names") else []
     lad = lad or ("Cardiff" if "Cardiff" in names else (names[0] if names else "Cardiff"))
     if mode == "prediction":
-        return [f"What is {lad}'s predicted EV keepership in 2045 under the central scenario?", "Which LADs diffuse most slowly?"]
+        return [f"How many private battery-electric cars are predicted for {lad} in 2045 under the central scenario?", "Which LADs diffuse most slowly?"]
     return [f"What do you know about {lad}?", "Which LAD has the most public EV chargers?"]
 
 
@@ -706,7 +707,7 @@ def check_scope(kg, question: str, mode: str = "actual", family: Optional[str] =
                           f"Prediction mode to ask about it.")
             else:
                 head = f"'{yb}' is beyond the prediction horizon."
-                reason = (f"Forecasts run to {p1} Q4" + (f" and the fleet-turnover scenario to {cov['turnover_end']} Q4"
+                reason = (f"Predictions run to {p1} Q4" + (f" and the fleet turnover path to {cov['turnover_end']} Q4"
                                                         if cov["turnover_end"] else "") + "; nothing after that is modelled.")
             return _finish(kg, mode, head, reason, "temporal", [str(yb)], modelled, lad_name)
 
